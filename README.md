@@ -4,8 +4,6 @@
 
 基于 Tauri 2、Vue 3、CodeMirror 6 和 Rust 。
 
-[下载最新版本](https://github.com/Chikomago/Markart/releases/latest) · [查看源码](https://github.com/Chikomago/Markart)
-
 本项目不提供插件审核，可自行创建。
 
 ## 项目功能
@@ -81,8 +79,6 @@ npm run dev
 
 `npm run desktop:build`
 
-正式发布使用 [GitHub Actions](.github/workflows/release.yml) 构建 macOS、Windows 和 Linux 安装包，并生成签名更新文件。发布步骤见 [docs/releasing.md](docs/releasing.md)。
-
 
 ## 开发
 
@@ -92,4 +88,4 @@ npm run dev
 
 ## 协议
 
-[GPL-3.0-only](LICENSE)。作者：chikomago。
+[GPL-3.0-only](LICENSE)。
