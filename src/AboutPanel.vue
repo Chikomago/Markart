@@ -49,6 +49,7 @@ async function openLink(url: string) {
 .about-panel dt{color:var(--muted)}
 .about-panel dd{margin:0;text-align:right;overflow-wrap:anywhere}
 .about-panel button{padding:2px 0;border:0;background:transparent;color:var(--accent);font:inherit;cursor:pointer}
+.about-panel dd button{color:var(--ink)}
 .about-panel button:hover{text-decoration:underline}
 .about-update{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:25px}
 .about-update button{padding:7px 12px;border:1px solid var(--line-strong);border-radius:6px;background:var(--paper);color:var(--ink)}

@@ -191,9 +191,9 @@ pub fn run() {
             let sep2 = PredefinedMenuItem::separator(app)?;
             let sep3 = PredefinedMenuItem::separator(app)?;
             #[cfg(target_os = "macos")]
-            let about_item = MenuItem::with_id(app, "app-about", "关于 Markart", true, None::<&str>)?;
+            let about_item = MenuItem::with_id(app, "app-about", "关于", true, None::<&str>)?;
             #[cfg(not(target_os = "macos"))]
-            let about_item = PredefinedMenuItem::about(app, Some("关于 Markart"), Some(AboutMetadata {
+            let about_item = PredefinedMenuItem::about(app, Some("关于"), Some(AboutMetadata {
                 name: Some("Markart".into()), version: Some(app.package_info().version.to_string()),
                 icon: Some(tauri::include_image!("icons/128x128.png")),
                 authors: Some(vec![env!("CARGO_PKG_AUTHORS").into()]), license: Some(env!("CARGO_PKG_LICENSE").into()),

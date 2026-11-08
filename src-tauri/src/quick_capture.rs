@@ -226,7 +226,9 @@ pub fn set_quick_capture(app: AppHandle, enabled: bool, corner: String, shortcut
                 "quick-quit" => { app.state::<QuickCaptureState>().enabled.store(false, Ordering::SeqCst); app.exit(0); },
                 _ => {}
             });
-            if let Some(icon) = app.default_window_icon() { builder = builder.icon(icon.clone()); }
+            builder = builder.icon(tauri::include_image!("icons/tray-template.png"));
+            #[cfg(target_os = "macos")]
+            { builder = builder.icon_as_template(true); }
             let tray = builder.build(&app).map_err(|error| error.to_string())?;
             *state.tray.lock().map_err(|error| error.to_string())? = Some(tray);
         }

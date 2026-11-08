@@ -45,7 +45,7 @@ export function usePreferences(deps: {
   watch(showSettings, open => { if (open) void nextTick(() => settingsSearchInput.value?.focus()) })
   const settingTab = ref<SettingTab>('appearance')
   const settingSearch = ref('')
-  const settingCategoryNames: Record<BuiltinSettingTab, string> = { plugins: '插件', layout: '布局', appearance: '外观', startup: '系统', quickCapture: '快速记录', storage: '存储', sync: '同步', editor: '编辑器', templates: '模板', snippets: '片段', shortcuts: '快捷键', spellcheck: '拼写检查', export: '导出', about: '关于 Markart' }
+  const settingCategoryNames: Record<BuiltinSettingTab, string> = { plugins: '插件', layout: '布局', appearance: '外观', startup: '系统', quickCapture: '快速记录', storage: '存储', sync: '同步', editor: '编辑器', templates: '模板', snippets: '片段', shortcuts: '快捷键', spellcheck: '拼写检查', export: '导出', about: '关于' }
   const pluginSettingCategories = computed(() => pluginRuntime.state.settingsCategories.slice().sort((a, b) => (a.order || 0) - (b.order || 0)))
   function settingCategoryTitle(tab: SettingTab) {
     return tab.includes(':') ? pluginSettingCategories.value.find(item => item.id === tab)?.title || '' : t(settingCategoryNames[tab as BuiltinSettingTab])
