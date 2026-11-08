@@ -61,14 +61,14 @@ pub async fn confirm_discard_changes(
         let save = wide(&save_label);
         let discard = wide(&discard_label);
         let cancel = wide(&cancel_label);
-        let buttons = [
-            TASKDIALOG_BUTTON { nButtonID: 101, pszButtonText: save.as_ptr() },
-            TASKDIALOG_BUTTON { nButtonID: 102, pszButtonText: discard.as_ptr() },
-            TASKDIALOG_BUTTON { nButtonID: 103, pszButtonText: cancel.as_ptr() },
-        ];
         let pointer = window.hwnd().map_err(|error| error.to_string())?.0 as usize;
         let (sender, receiver) = std::sync::mpsc::channel();
         window.run_on_main_thread(move || {
+            let buttons = [
+                TASKDIALOG_BUTTON { nButtonID: 101, pszButtonText: save.as_ptr() },
+                TASKDIALOG_BUTTON { nButtonID: 102, pszButtonText: discard.as_ptr() },
+                TASKDIALOG_BUTTON { nButtonID: 103, pszButtonText: cancel.as_ptr() },
+            ];
             let config = TASKDIALOGCONFIG {
                 cbSize: std::mem::size_of::<TASKDIALOGCONFIG>() as u32,
                 hwndParent: pointer as _,
