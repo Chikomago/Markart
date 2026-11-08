@@ -62,3 +62,12 @@ jobs:
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
           args: --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
+      - name: Check macOS runtime libraries
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          binary="src-tauri/target/${{ matrix.target }}/release/bundle/macos/Markart.app/Contents/MacOS/markart"
+          if otool -L "$binary" | grep -E '/opt/homebrew/|/usr/local/'; then
+            echo 'macOS app links to a Homebrew library that may be missing on user devices.' >&2
+            exit 1
+          fi
