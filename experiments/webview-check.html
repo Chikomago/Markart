@@ -1,0 +1,8 @@
+<!doctype html><html><head><style>html,body{margin:0;height:100%;background:#ccc}#host{width:min(860px,95vw);height:560px;max-height:90vh;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden}</style></head><body><div id="host"></div><script type="module">
+import {mountWebView} from '/src/plugins/webview/mount.ts'
+import html from '/examples/plugins/ai-agent/views/index.html?raw'
+import js from '/examples/plugins/ai-agent/views/app.js?raw'
+import css from '/examples/plugins/ai-agent/views/app.css?raw'
+const resources=Object.fromEntries(Object.entries({'views/index.html':html,'views/app.js':js,'views/app.css':css}).map(([path,value])=>[path,Array.from(new TextEncoder().encode(value))]))
+mountWebView(document.querySelector('#host'),'views/index.html',resources,async(method)=>{if(method==='files.view')return {root:'/test'};if(method==='files.list')return [];if(method==='storage.get')return {apiKey:'fixture'};if(method==='network.request')return {status:200,body:JSON.stringify({choices:[{message:{content:'长内容布局测试。\n'.repeat(200)}}]})};return null},()=>{})
+</script></body></html>

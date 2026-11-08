@@ -1,0 +1,12 @@
+.app-shell {
+  color-scheme:dark;
+  --accent-ink:#302d25;--bg:#2b2d34;--panel:#34363e;--paper:#3b3d45;--ink:#eeede8;--muted:#bebfc3;
+  --line:#4a4c55;--line-strong:#656773;--accent:#dfcca6;--accent-soft:#514c43;--hover:#484a53;
+  --shadow:0 16px 44px rgba(15,16,22,.25);
+  --tab-inactive-bg:transparent;--tab-hover-bg:var(--hover);--tab-inactive-ink:var(--muted);--tab-active-ink:var(--ink);
+  --tabbar-bg:#2b2d34;--tab-active-bg:#484a53;--tab-divider:#555761;--tab-active-shadow:0 2px 8px rgba(15,16,22,.16);
+  --code-text:#e0ded6;--syntax-keyword:#d6b9db;--syntax-string:#bdd3aa;--syntax-number:#e7c39e;
+  --syntax-comment:#b4b7c0;--syntax-function:#a7cddd;--syntax-type:#dfcca6;--syntax-heading:#eeede8;
+  --syntax-link:#dfcca6;--syntax-markup:#b4b7c0;--syntax-invalid:#f2aaa9;
+  --theme-note:#adc9e2;--theme-tip:#b4d2b5;--theme-important:#d6b9db;--theme-warning:#e7c994;--theme-caution:#f2aaa9;
+}

@@ -1,0 +1,9 @@
+.sidebar-test-01 {
+  height: 100%; min-height: 0; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 12px; overflow: hidden;
+  background: var(--hover); border: 1px solid var(--line); border-radius: 8px;
+  color: var(--muted); font-size: 11px;
+}
+.sidebar-test-01-badge { color: var(--ink); font-size: 18px; font-weight: 500; }
+.sidebar-test-01 output { font-variant-numeric: tabular-nums; }

@@ -1,0 +1,9 @@
+import {readFileSync,writeFileSync,mkdtempSync} from 'node:fs'
+import {execFileSync} from 'node:child_process'
+const dir=mkdtempSync('/tmp/markart-font-check-')
+const css=readFileSync('src/style.css','utf8').replace(/@import[^;]+;/g,'')
+const markup=['source','wysiwyg','preview'].map(mode=>`<div class="cm-document-editor ${mode==='source'?'':'cm-rich-mode'}" data-mode="${mode}"><div class="cm-scroller"><div class="cm-content">Font check 字体</div></div></div>`).join('')
+writeFileSync(dir+'/test.html',`<style>${css}.app-shell{--editor-font-family:Georgia;--editor-font-size:16px;--editor-line-height:1.6;height:600px}.cm-document-editor{height:100px}</style><div class="app-shell">${markup}</div><pre id="result">WAIT</pre><script>try{const shell=document.querySelector('.app-shell');for(const family of ['Georgia','Times New Roman']){shell.style.setProperty('--editor-font-family',family);for(const el of document.querySelectorAll('.cm-scroller')){if(!getComputedStyle(el).fontFamily.includes(family))throw Error(el.parentElement.dataset.mode+' ignores '+family+': '+getComputedStyle(el).fontFamily)}}document.querySelector('#result').textContent='PASS editor font applies and updates in source, WYSIWYG and split preview'}catch(e){document.querySelector('#result').textContent='FAIL '+e.message}</script>`)
+const swift=readFileSync('scripts/fixtures/webkit-runner.swift','utf8').replace('result.hasPrefix("[")','(result.hasPrefix("PASS") || result.hasPrefix("FAIL"))')
+writeFileSync(dir+'/runner.swift',swift);execFileSync('swiftc',['-module-cache-path','/tmp/markart-swift-cache',dir+'/runner.swift','-o',dir+'/runner'])
+const output=execFileSync(dir+'/runner',[dir+'/test.html'],{encoding:'utf8',timeout:35000});const result=output.match(/<pre id="result">(.*?)<\/pre>/s)?.[1];console.log(result);if(!result?.startsWith('PASS '))process.exitCode=1

@@ -1,0 +1,12 @@
+{
+  "name": "暮灰",
+  "description": "石墨 · 米金",
+  "preview": [
+    "#34363e",
+    "#3b3d45",
+    "#dfcca6"
+  ],
+  "styles": [
+    "theme.css"
+  ]
+}

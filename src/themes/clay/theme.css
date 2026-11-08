@@ -1,0 +1,12 @@
+.app-shell {
+  color-scheme:light;
+  --bg:#f4eee4;--panel:#eee5d8;--paper:#fbf7ef;--ink:#433a32;--muted:#74634f;
+  --line:#e4dacb;--line-strong:#cdbca6;--accent:#a54d37;--accent-soft:#f0dfd4;--hover:#e8ddcd;
+  --shadow:0 16px 48px rgba(79,53,31,.12);
+  --tab-inactive-bg:transparent;--tab-hover-bg:var(--hover);--tab-inactive-ink:var(--muted);--tab-active-ink:var(--ink);
+  --tabbar-bg:#f4eee4;--tab-active-bg:#fbf7ef;--tab-divider:#d9cbbb;--tab-active-shadow:0 2px 8px rgba(79,53,31,.08);
+  --code-text:#564939;--syntax-keyword:#955066;--syntax-string:#66783c;--syntax-number:#a55330;
+  --syntax-comment:#887b69;--syntax-function:#3b7272;--syntax-type:#927023;--syntax-heading:#433a32;
+  --syntax-link:#a54d37;--syntax-markup:#99846d;--syntax-invalid:#b13939;
+  --theme-note:#587a92;--theme-tip:#667d49;--theme-important:#916482;--theme-warning:#aa792a;--theme-caution:#b25b43;
+}

@@ -1,0 +1,85 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { build } from 'esbuild'
+const result = await build({ stdin: { contents: "export { PluginRuntime } from './plugins/runtime'; export * from './plugins/sidebarSizing'; export * from './plugins/shortcuts'", resolveDir: process.cwd() + '/src', loader: 'ts' }, bundle: true, platform: 'node', format: 'esm', write: false })
+const { PluginRuntime, equalSidebarShares, resizeSidebarPair, pluginShortcutChord } = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`)
+globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} }
+const pkg = id => ({ manifest: { id }, main: id })
+test('sidebar shares split equally, drag affects only adjacent blocks and preserves total height', () => {
+ const shares = equalSidebarShares(3)
+ assert.deepEqual(shares, [1/3, 1/3, 1/3])
+ const resized = resizeSidebarPair(shares, 0, 50, 200)
+ assert.equal(resized[2], shares[2])
+ assert.equal(resized.reduce((a,b)=>a+b), 1)
+ assert.ok(resized[0] > shares[0])
+ const bounded = resizeSidebarPair(shares, 0, 10000, 200)
+ assert.ok(bounded[1] > 0)
+ assert.deepEqual(equalSidebarShares(4), [.25,.25,.25,.25])
+})
+test('fixed views reject free layout locations; actions and dialogs clean up with owner', async () => {
+ let host, seen
+ const runtime = new PluginRuntime(async () => ({ activate(api) { host = api } }))
+ const doc = { id:'active',path:'a.md',content:'Active' }, other = { id:'other',path:'b.md',content:'Other' }
+ runtime.bind({ notify(){},active:()=>doc,list:()=>[doc,other],root:()=>'/workspace',selection:()=>({from:0,to:1,text:'A'}) })
+ await runtime.enable(pkg('example'))
+ assert.equal(host.ui.registerLayout, undefined)
+ assert.throws(()=>host.ui.registerView({id:'left',title:'Left',location:'left',mount(){}}))
+ host.ui.registerView({id:'right',title:'Right',location:'right',mount(){}})
+ host.commands.register({id:'inspect',title:'Inspect',run:context=>{seen=context}})
+ host.ui.registerAction({id:'tab',commandId:'inspect',location:'tab-context'})
+ assert.throws(()=>host.ui.registerAction({id:'bad',commandId:'missing',location:'topbar-menu'}))
+ const context = runtime.context({location:'tab-context',documentId:'other'})
+ assert.equal(context.document.id,'other'); assert.equal(context.selection,null)
+ await runtime.runAction(runtime.actionsAt('tab-context',context)[0],context)
+ assert.equal(seen.document.id,'other')
+ const file = runtime.context({location:'file-tree',target:{path:'b.md',kind:'file'}})
+ assert.equal(file.document.id,'other'); assert.equal(file.target.kind,'file')
+ const folder = runtime.context({target:{path:'folder',kind:'file'}})
+ assert.equal(folder.document,null); assert.equal(folder.target.kind,'folder')
+ host.ui.openDialog({title:'Dialog',context,mount(){}})
+ assert.equal(runtime.state.dialogs[0].context.document.id,'other')
+ await runtime.disable('example')
+ assert.equal(runtime.state.actions.length,0);assert.equal(runtime.state.views.length,0);assert.equal(runtime.state.dialogs.length,0)
+ assert.throws(()=>host.ui.registerView({id:'late',title:'Late',mount(){}}))
+})
+test('plugin shortcuts persist separately, reject reserved and duplicate chords and can be cleared', async () => {
+ let host
+ const runtime = new PluginRuntime(async () => ({ activate(api){host=api} }))
+ runtime.bind({notify(){}});await runtime.enable(pkg('shortcuts'))
+ host.commands.register({id:'one',title:'One',run(){}});host.commands.register({id:'two',title:'Two',run(){}})
+ runtime.setShortcut('shortcuts:one','Meta+Alt+Shift+KeyY')
+ assert.equal(runtime.assignedShortcut('shortcuts:one'),'Meta+Alt+Shift+KeyY')
+ assert.throws(()=>runtime.setShortcut('shortcuts:two','Meta+Alt+Shift+KeyY'))
+ assert.throws(()=>runtime.setShortcut('shortcuts:two','Meta+KeyQ'))
+ assert.throws(()=>runtime.setShortcut('shortcuts:two','Meta+KeyZ'))
+ runtime.setShortcut('shortcuts:one','');assert.equal(runtime.assignedShortcut('shortcuts:one'),'')
+ assert.equal(pluginShortcutChord('cmd+alt+y'),'Meta+Alt+KeyY')
+ await runtime.disable('shortcuts')
+})
+
+test('menu is the only topbar entry point, including existing API v1 callers', async () => {
+ let host
+ const runtime = new PluginRuntime(async () => ({ activate(api) { host = api } }))
+ runtime.bind({ root:()=>'/workspace',active:()=>null,list:()=>[],notify(){} })
+ await runtime.enable(pkg('example.topbar'))
+ host.commands.register({id:'inspect',title:'Inspect',run(){}})
+ const remove = host.ui.registerAction({id:'menu',commandId:'inspect',location:'topbar-menu'})
+ host.ui.registerAction({id:'previous',commandId:'inspect',location:'topbar'})
+ host.ui.addToolbarButton('inspect')
+ assert.equal(runtime.actionsAt('topbar-menu',runtime.context()).length,3)
+ assert.equal(runtime.state.actions.some(action=>action.location==='topbar'),false)
+ remove();await runtime.disable('example.topbar');assert.equal(runtime.state.actions.length,0)
+})
+
+test('dialogs opt into persistent windows with a boolean flag; handles stay cleanable', async () => {
+ let host
+ const runtime = new PluginRuntime(async () => ({ activate(api) { host = api } }))
+ runtime.bind({ root:()=>'/workspace',active:()=>null,list:()=>[],notify(){} })
+ await runtime.enable(pkg('dialogs'))
+ host.ui.openDialog({title:'Float',persistent:true,mount(){}})
+ assert.equal(runtime.state.dialogs[0].persistent,true)
+ assert.throws(()=>host.ui.openDialog({title:'Bad',persistent:'yes',mount(){}}))
+ host.ui.openDialog({title:'Plain',mount(){}})
+ assert.equal('persistent' in runtime.state.dialogs[1],false)
+ await runtime.disable('dialogs');assert.equal(runtime.state.dialogs.length,0)
+})

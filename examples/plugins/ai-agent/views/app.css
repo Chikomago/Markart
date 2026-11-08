@@ -1,0 +1,44 @@
+:root{color-scheme:light dark;--glass:light-dark(rgba(242,244,247,.95),rgba(42,44,49,.96));--ink:light-dark(#303641,#eceef2);--line:light-dark(#cdd2da,#5b606b);--muted:light-dark(#747b87,#acb2bc)}*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--ink);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:14px}main{animation:appear .22s ease-out}form{display:flex;gap:10px;align-items:center}.query,.orb{background:var(--glass);border:1px solid var(--line);box-shadow:0 3px 12px #00000012}.query{display:flex;align-items:center;gap:14px;border-radius:40px;padding:0 18px;height:66px;flex:1;min-width:0}.query>svg{width:27px;height:27px;flex:none}svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}input{background:transparent;border:0;outline:0;color:inherit;font:inherit;font-size:22px;width:100%;min-width:0}input::placeholder{color:var(--muted);font-size:20px}.orb{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;flex:none;cursor:pointer;color:var(--muted);transition:transform .16s,background .16s,color .16s}.orb svg{width:27px;height:27px}.orb:hover{transform:translateY(-2px);color:var(--ink)}.orb.active{color:var(--ink);background:light-dark(#fff,#535966)}button{font:inherit;color:inherit;cursor:pointer}.send{border:0;background:transparent;color:var(--muted);font-size:24px;padding:0}section{margin-top:14px;border:1px solid var(--line);border-radius:20px;background:var(--glass);box-shadow:0 8px 30px #00000018;max-height:440px;overflow:auto;padding:18px 22px;animation:appear .18s ease-out}header{display:flex;justify-content:space-between;align-items:center}small,#status{color:var(--muted);font-size:12px}pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;margin:12px 0}footer{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding-top:12px}footer button,.file{background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px 12px}.file{display:block;text-align:left;width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;overflow-wrap:anywhere}.file:hover{background:#80808015}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:2px solid var(--muted);outline-offset:3px}@keyframes appear{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}@media(max-width:620px){form{gap:6px}.orb{width:42px;height:42px}.orb svg{width:21px;height:21px}.query{height:52px;padding:0 12px;gap:8px}input,input::placeholder{font-size:16px}}
+
+html{height:100%;overflow:hidden;background:transparent}
+body{height:100%;overflow:hidden;display:flex;justify-content:center;align-items:stretch}
+main{position:relative;width:100%;height:100%;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:14px;padding-top:26px}
+form{grid-row:2;min-width:0}
+section{grid-row:1;grid-column:1;margin:0;max-height:none;height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:10px;transform-origin:bottom center}
+section header,section footer{flex:none}
+.preview-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:8px}
+#status:empty,#reply:empty{display:none}
+section footer{padding-top:12px;margin-top:0}
+
+
+
+:root{--glass:var(--markart-paper,#f2f4f7);--ink:var(--markart-ink,#303641);--line:var(--markart-line,#cdd2da);--muted:var(--markart-muted,#747b87)}.orb.active{background:var(--markart-hover,var(--glass));color:var(--ink)}.orb:hover,.file:hover{background:var(--markart-hover,var(--glass))}
+
+.query{width:100%}
+
+.instruction{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:var(--markart-hover,#80808015);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}.instruction:empty{display:none}
+
+.query{height:54px;padding:0 16px;gap:12px}input{font-size:18px}input::placeholder{font-size:18px}.query>svg{width:23px;height:23px}.send{font-size:21px}form{min-height:54px}
+
+body:not(.preview-open){padding:0}body:not(.preview-open) main{display:flex;flex-direction:column;justify-content:flex-end;gap:0;padding:0}body:not(.preview-open) form{height:54px;min-height:54px;flex:none}body:not(.preview-open) .query{box-shadow:none}
+
+form{width:560px;max-width:100%;justify-self:center;align-self:center;min-height:46px}
+.query{height:46px;padding:0 14px;gap:10px}
+input,input::placeholder{font-size:16px}
+.query>svg{width:21px;height:21px}
+.send{font-size:19px}
+body:not(.preview-open) form{height:46px;min-height:46px}
+
+form{display:flex;flex-direction:column;gap:8px}body:not(.preview-open) form{height:auto;min-height:46px}
+.query{flex:none;width:100%}#upload{border:0;background:transparent;color:var(--muted);padding:0;display:grid;place-items:center}#upload svg{width:20px;height:20px}
+#attachments,#sent-images{display:flex;gap:8px;width:100%;flex-wrap:wrap}#sent-images{margin-bottom:12px}.attachment{position:relative;flex:none}.attachment img{width:64px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}.attachment button{position:absolute;right:-5px;top:-5px;background:var(--glass);border:1px solid var(--line);border-radius:50%;width:20px;height:20px;padding:0;line-height:1}
+
+.send{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--markart-hover,#80808015);color:var(--ink);padding:0}.send svg{width:20px;height:20px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.send:hover{background:var(--markart-line,#ccd1d8)}
+
+body.has-attachments form{padding:0;gap:10px;background:transparent;border:0;border-radius:0}
+body.has-attachments .query{height:46px;padding:0 14px;gap:10px;border:1px solid var(--line);border-radius:40px;background:var(--glass);box-shadow:0 3px 8px rgba(0,0,0,.10)}
+body.has-attachments #attachments{padding:5px 8px 0}
+body.has-attachments .attachment img{width:72px;height:58px;border-radius:8px;background:var(--glass);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+body.has-attachments .attachment button{right:-4px;top:-3px}
+
+#attachments{order:2}.query{order:1}body.has-attachments #attachments{padding:0 8px 5px}

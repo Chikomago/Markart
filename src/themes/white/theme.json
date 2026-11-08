@@ -1,0 +1,12 @@
+{
+  "name": "素白",
+  "description": "纯白 · 苔绿",
+  "preview": [
+    "#f4f4f0",
+    "#ffffff",
+    "#52694b"
+  ],
+  "styles": [
+    "theme.css"
+  ]
+}

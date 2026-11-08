@@ -1,0 +1,2 @@
+const methods=/^(editor\.(getSnapshot|getSelection|getCursor|getMode|applyEdits|transaction|setSelection|setCursor)|files\.(list|view|get|open|readText|readFrontmatter)|index\.(files|content|metadata|links|tagged)|secrets\.(get|set|remove)|storage\.(get|set|remove)|network\.request|clipboard\.(readText|writeText)|ui\.notify)$/
+export const isWebViewMethod=(method:unknown):method is string=>typeof method==='string'&&methods.test(method)

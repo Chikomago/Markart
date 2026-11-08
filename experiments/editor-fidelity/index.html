@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="UTF-8" />
+  <title>CodeMirror 局部编辑保真实验</title>
+  <style>
+    body{font:15px system-ui,sans-serif;max-width:820px;margin:35px auto;color:#242924}
+    button{padding:7px 12px;margin:0 6px 12px 0}
+    #editor{border:1px solid #bbb;min-height:300px}
+    .cm-editor{height:300px}.cm-content{padding:18px 22px}
+    .cm-line.probe-heading{font-size:1.65em;font-weight:700;margin:12px 0 8px}
+    pre{white-space:pre-wrap;background:#f5f5f3;padding:16px;overflow:auto}
+  </style>
+<body>
+  <h1>CodeMirror 6 局部编辑实验</h1>
+  <p>“排版视图”仅演示标题标记隐藏；源文本始终由同一个 CodeMirror 状态保存。</p>
+  <button id="mode">切换到源码视图</button><button id="replace">局部改写目标段落</button><button id="undo">撤销</button>
+  <div id="editor"></div>
+  <h2>当前原文</h2><pre id="source"></pre>
+  <pre id="error"></pre>
+  <script type="module">import('./main.js').catch(error => { document.querySelector('#error').textContent = error.stack || String(error) })</script>
+</body>
+</html>

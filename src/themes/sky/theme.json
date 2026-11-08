@@ -1,0 +1,12 @@
+{
+  "name": "晴空",
+  "styles": [
+    "theme.css"
+  ],
+  "description": "冷白 · 钴蓝",
+  "preview": [
+    "#edf1f7",
+    "#ffffff",
+    "#315bba"
+  ]
+}

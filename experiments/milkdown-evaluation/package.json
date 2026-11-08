@@ -1,0 +1,12 @@
+{
+  "name": "markart-milkdown-evaluation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node roundtrip.mjs"
+  },
+  "dependencies": {
+    "@milkdown/kit": "7.22.3",
+    "jsdom": "26.1.0"
+  }
+}

@@ -1,0 +1,13 @@
+.ai-agent{display:flex;flex-direction:column;gap:16px;padding:8px;min-width:0}
+.ai-agent-modes{display:flex;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.ai-agent button{border:1px solid transparent;border-radius:9px;background:transparent;color:var(--muted);padding:7px 12px;cursor:pointer;transition:background .16s,color .16s}
+.ai-agent button:hover{background:var(--line);color:var(--ink)}
+.ai-agent button.is-active{background:var(--line);color:var(--ink)}
+.ai-agent button:disabled{opacity:.5;cursor:default}
+.ai-agent textarea.ai-agent-input{box-sizing:border-box;width:100%;min-height:96px;resize:vertical;line-height:1.65;font-size:18px;border:0;outline:none;background:transparent;color:var(--ink);padding:4px}
+.ai-agent-row{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.ai-agent-row small{margin-right:auto}
+.ai-agent-hint{color:var(--muted);font-size:12px}
+.ai-agent-reply{white-space:pre-wrap;overflow-wrap:anywhere;max-height:45vh;overflow:auto;line-height:1.75;padding:4px 8px 4px 0}
+.ai-agent-error{margin:0;color:var(--ink);font-size:12px;overflow-wrap:anywhere}
+.ai-agent button.ai-agent-file{text-align:left;border-bottom:1px solid var(--line);border-radius:0;overflow-wrap:anywhere}

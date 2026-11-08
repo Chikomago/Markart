@@ -1,0 +1,16 @@
+{
+  "apiVersion": 2,
+  "id": "markart.graph",
+  "name": "图谱",
+  "version": "0.2.0",
+  "minAppVersion": "0.1.0",
+  "description": "基于文件索引查看文件之间的链接",
+  "permissions": {
+    "required": [
+      "editor.read",
+      "files.read",
+      "index.read"
+    ],
+    "optional": []
+  }
+}

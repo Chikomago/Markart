@@ -1,0 +1,16 @@
+{
+  "apiVersion": 2,
+  "id": "markart.tags",
+  "name": "标签",
+  "version": "0.1.0",
+  "minAppVersion": "0.1.0",
+  "description": "浏览标签及其关联文件",
+  "permissions": {
+    "required": [
+      "editor.read",
+      "files.read",
+      "index.read"
+    ],
+    "optional": []
+  }
+}

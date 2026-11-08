@@ -1,0 +1,30 @@
+{
+  "productName": "Markart Dev",
+  "identifier": "com.markart.dev",
+  "bundle": {
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": false
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": {
+          "x": 18,
+          "y": 26
+        },
+        "maximized": true,
+        "devtools": false,
+        "dragDropEnabled": false
+      }
+    ]
+  }
+}

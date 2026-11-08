@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><style>body{font:16px system-ui}#background{height:60px;border:1px solid gray}#host{position:fixed;left:20px;top:100px;width:860px;height:560px}.opening{animation:appear .18s}@keyframes appear{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}</style><h1>聚焦重开验证（模拟内容）</h1><div id="background" contenteditable="true">模拟编辑区</div><div id="host"></div><script type="module">
+import {mountWebView} from '/src/plugins/webview/mount.ts'
+import html from '/examples/plugins/ai-agent/views/index.html?raw'
+import js from '/examples/plugins/ai-agent/views/app.js?raw'
+import css from '/examples/plugins/ai-agent/views/app.css?raw'
+const resources=Object.fromEntries(Object.entries({'views/index.html':html,'views/app.js':js+`;window.addEventListener('markart-focus',()=>setTimeout(()=>parent.postMessage({type:'probe-focus',focused:document.activeElement===document.querySelector('[autofocus]')},'*'),100))`,'views/app.css':css}).map(([path,value])=>[path,Array.from(new TextEncoder().encode(value))]))
+const focusResults=[];window.addEventListener('message',e=>{if(e.data?.type==='probe-focus')focusResults.push(e.data.focused)});const host=document.querySelector('#host');let clear,first=true
+function open(){clear?.();document.querySelector('#background').focus();host.style.width='860px';host.style.height='560px';host.classList.remove('opening');void host.offsetWidth;host.classList.add('opening');first=true;clear=mountWebView(host,'views/index.html',resources,async()=>null,()=>{clear?.();clear=null;document.querySelector('#background').focus()})}
+host.addEventListener('plugin-webview-height',event=>{const {height,width,expanded}=event.detail;host.style.height=(expanded?560:Math.max(40,height))+'px';host.style.width=(expanded?860:width||860)+'px';if(first){first=false;queueMicrotask(()=>{const frame=host.querySelector('iframe');frame.focus();if(new URLSearchParams(location.search).get('mode')==='window')frame.contentWindow.focus();frame.contentWindow.postMessage({type:'markart-web-focus'},'*')})}})
+setTimeout(open,200)
+setTimeout(()=>{clear?.();clear=null;document.querySelector('#background').focus()},1000)
+setTimeout(open,1300)
+setTimeout(()=>{window.__TAURI_INTERNALS__?.invoke('focus_probe_report',{value:{mode:new URLSearchParams(location.search).get('mode')||'current',done:true,focusResults}})},2200)
+</script>

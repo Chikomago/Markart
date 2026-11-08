@@ -1,0 +1,11 @@
+{
+  "apiVersion": 2,
+  "id": "dev.markart.ui-extensions",
+  "name": "界面扩展测试",
+  "version": "0.1.1",
+  "description": "侧栏面板接口验证",
+  "permissions": {
+    "required": [],
+    "optional": []
+  }
+}

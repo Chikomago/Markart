@@ -1,0 +1,9 @@
+{
+  "productName": "Markart Association Probe",
+  "identifier": "com.markart.association-probe",
+  "bundle": {
+    "fileAssociations": [
+      { "ext": ["md", "markdown"], "name": "Markdown", "role": "Editor", "rank": "Alternate" }
+    ]
+  }
+}

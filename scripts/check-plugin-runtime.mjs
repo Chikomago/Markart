@@ -1,0 +1,40 @@
+import { build } from 'esbuild'
+import assert from 'node:assert/strict'
+const { outputFiles } = await build({ entryPoints: ['src/plugins/runtime.ts'], bundle: true, platform: 'node', format: 'esm', write: false })
+const { PluginRuntime } = await import('data:text/javascript;base64,' + Buffer.from(outputFiles[0].text).toString('base64'))
+const values = new Map(), handlers = new Map()
+globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) }
+globalThis.window = { setTimeout, clearTimeout, setInterval, clearInterval, addEventListener: (key, value) => handlers.set(value, key), removeEventListener: (_key, value) => handlers.delete(value) }
+let selectedTheme = '素白'
+let source = 'Original', history = [], calls = 0, cleaned = 0, host
+const adapter = { active: () => ({ id: 'doc', content: source }), list: () => [], open: async () => {}, save: async () => {}, selection: () => ({ from: 0, to: source.length, text: source }), replace: (from, to, text) => { history.push(source); source = source.slice(0, from) + text + source.slice(to) }, select: () => {}, format: () => {}, undo: () => { source = history.pop() }, redo: () => {}, root: () => '/workspace', listThemes: () => [{ id: '素白', name: '素白', css: '' }, { id: '深海', name: '深海', css: '' }], currentTheme: () => selectedTheme, selectTheme: id => { selectedTheme = id }, notify: () => {}, prompt: async () => null }
+const pkg = id => ({ manifest: { apiVersion: 1, id, name: id, version: '1.0.0' }, repo: 'test/plugin', main: '', downloadedAt: '' })
+const runtime = new PluginRuntime(async () => ({ activate(api) { host = api; api.commands.register({ id: 'replace', title: 'Replace', shortcut: 'mod+shift+u', run: () => api.editor.insertText('Plugin') }); api.events.on('document:change', () => calls++); api.ui.addMenuItem('replace'); api.ui.registerView({ id: 'view', title: 'View', mount: () => {} }); api.providers.register('agent', { id: 'echo', title: 'Echo', run: input => input }); api.track(() => { cleaned++ }) } }))
+runtime.bind(adapter)
+await runtime.enable(pkg('test.one'))
+assert.equal(runtime.state.enabled.length, 1); assert.equal(runtime.state.actions.filter(action => action.location === 'topbar-menu').length, 1)
+await runtime.execute('test.one:replace'); assert.equal(source, 'Plugin'); host.editor.undo(); assert.equal(source, 'Original')
+runtime.emit('document:change', {}); assert.equal(calls, 1)
+assert.deepEqual(await host.providers.call('agent', 'echo', { hello: true }), { hello: true })
+host.storage.set('config', { yes: true }); assert.deepEqual(host.storage.get('config'), { yes: true })
+assert.throws(() => host.editor.replaceRange(-1, 1, 'x'), /范围/)
+assert.throws(() => host.commands.register({ id: 'replace', title: 'Duplicate', run() {} }), /重复/)
+host.themes.register({ id: 'ocean', name: '海蓝', css: '.app-shell{--accent:#75bfff}' })
+assert.equal(host.themes.list().find(theme => theme.id === 'test.one:ocean').name, '海蓝')
+host.themes.select('ocean'); assert.equal('base' in host.themes.current(), false); assert.equal(host.themes.current().css, '.app-shell{--accent:#75bfff}')
+const snapshot = host.themes.current(); snapshot.name = 'changed'; assert.equal(host.themes.current().name, '海蓝')
+assert.throws(() => host.themes.register({ id: 'ocean', name: 'Duplicate', css: '' }), /重复/)
+assert.throws(() => host.themes.register({ id: 'external', name: 'External', css: '@import url(https://example.com);' }), /外部/)
+host.themes.unregister('ocean'); assert.equal(selectedTheme, '素白'); assert.equal(runtime.state.themes.length, 0)
+host.themes.register({ id: 'ocean', name: '海蓝', css: '.app-shell{--accent:blue}' })
+host.themes.select('深海'); assert.equal(host.themes.current().id, '深海')
+host.themes.select('ocean')
+await runtime.disable('test.one')
+assert.equal(selectedTheme, '素白'); assert.equal(runtime.state.themes.length, 0)
+assert.equal(cleaned, 1); assert.equal(runtime.state.commands.length, 0); assert.equal(runtime.state.views.length, 0); assert.equal(runtime.state.providers.length, 0); assert.equal(handlers.size, 0)
+runtime.emit('document:change', {}); assert.equal(calls, 1); assert.throws(() => host.editor.insertText('late'), /停用/)
+const failed = new PluginRuntime(async () => ({ activate(api) { api.registerCommand('partial', 'Partial', () => {}); throw Error('activation failed') } }))
+failed.bind(adapter)
+await assert.rejects(failed.enable(pkg('test.failed')), /activation failed/)
+assert.equal(failed.state.commands.length, 0); assert.equal(failed.state.busy.length, 0); assert.equal(failed.state.enabled.length, 0)
+console.log('PASS plugin lifecycle, commands, shortcuts, document edits/history, events, storage, providers, disposal, activation rollback, theme registration/select/unregister/fallback')

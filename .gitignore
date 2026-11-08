@@ -1,0 +1,13 @@
+node_modules/
+public/vendor/vditor/
+dist/
+src-tauri/target/
+src-tauri/resources/pdf-export
+.DS_Store
+*.log
+.workbuddy/
+
+# Generated native build files
+/target/
+src-tauri/gen/
+src-tauri/resources/pdf-text

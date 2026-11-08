@@ -1,0 +1,16 @@
+{
+  "apiVersion": 2,
+  "id": "markart.backlinks",
+  "name": "反向链接",
+  "version": "0.1.0",
+  "minAppVersion": "0.1.0",
+  "description": "查看引用当前文件的来源文件",
+  "permissions": {
+    "required": [
+      "editor.read",
+      "files.read",
+      "index.read"
+    ],
+    "optional": []
+  }
+}

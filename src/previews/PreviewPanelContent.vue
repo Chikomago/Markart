@@ -1,0 +1,15 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { ChevronRight, File, Hash } from 'lucide-vue-next'
+type Note = { id: string; name: string; title: string; tags: string[]; intro: string }
+const props = defineProps<{ id: string; file: Note; files: Note[]; tags: { name: string; files: Note[] }[]; selectedTag?: string }>()
+const emit = defineEmits<{ openFile: [id: string]; scrollHeading: [index: number]; 'update:selectedTag': [value: string] }>()
+const selectedTag = computed({ get: () => props.selectedTag || '', set: value => emit('update:selectedTag', value) })
+const pickedTag = computed(() => props.tags.find(tag => tag.name === selectedTag.value))
+</script>
+<template>
+          <template v-if="id === 'graph'"><div class="preview-graph-heading"><h3>文件关系</h3><span>4 个文件 · 5 条链接</span></div><svg class="preview-graph" viewBox="0 0 310 360" aria-label="示例文件关系图"><g stroke="var(--line-strong)" stroke-width="1.2"><path d="M150 155L76 65M150 155L246 108M150 155L220 285M76 65L246 108M246 108L220 285"/></g><g v-for="node in [{x:150,y:155,id:'design',name:'插件系统设计'},{x:76,y:65,id:'writing',name:'写作流程'},{x:246,y:108,id:'index',name:'知识索引'},{x:220,y:285,id:'plan',name:'项目计划'}]" :key="node.id" role="button" tabindex="0" :aria-label="`打开${node.name}`" :class="{ selected: file.id === node.id }" @click="emit('openFile', node.id)" @keydown.enter="emit('openFile', node.id)" @keydown.space.prevent="emit('openFile', node.id)"><circle :cx="node.x" :cy="node.y" :r="file.id === node.id ? 10 : 6"/><text :x="node.x" :y="node.y+25" text-anchor="middle">{{ node.name }}</text></g></svg><p class="preview-graph-caption">点击节点打开文件</p><div class="preview-related"><span>当前文件</span><strong>{{ file.name }}</strong><p>与其他 3 个文件相连</p></div></template>
+          <template v-else-if="id === 'tags'"><div class="preview-section-title"><h3>全部标签</h3><small>{{ tags.length }}</small></div><button v-for="tag in tags" :key="tag.name" class="preview-list-row" :class="{ selected: selectedTag === tag.name }" @click="selectedTag = selectedTag === tag.name ? '' : tag.name"><Hash :size="14"/><span>{{ tag.name }}</span><small>{{ tag.files.length }}</small></button><div v-if="pickedTag" class="preview-tag-results"><span>#{{ pickedTag.name }} 中的文件</span><button v-for="item in pickedTag.files" :key="item.id" @click="emit('openFile', item.id)"><File :size="13"/>{{ item.name }}</button></div></template>
+          <template v-else-if="id === 'backlinks'"><div class="preview-section-title"><h3>链接到当前文件</h3><small>3</small></div><button v-for="item in files.filter(item => item.id !== file.id)" :key="item.id" class="preview-reference" @click="emit('openFile', item.id)"><File :size="14"/><span>{{ item.name }}<small>参见「{{ file.title }}」中的界面与内容。</small></span><ChevronRight :size="12"/></button></template>
+          <template v-else><div class="preview-section-title"><h3>当前文件大纲</h3></div><button v-for="(heading,index) in [file.title, '界面与内容', '面板的工作方式', '下一步']" :key="heading" class="preview-outline-row" @click="emit('scrollHeading', index)"><ChevronRight :size="12"/>{{ heading }}</button></template>
+</template>

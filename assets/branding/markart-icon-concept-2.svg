@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Markart 图标方案二</title>
+  <desc id="description">白底黑色居中 M，下面是一笔画出的墨迹与笔尖，再下方是独立的 art 字样</desc>
+
+  <rect x="20" y="20" width="472" height="472" rx="110" fill="#E6E6E4"/>
+  <rect x="24" y="24" width="464" height="464" rx="106" fill="#FFFFFF"/>
+
+  <g transform="translate(29 -126) scale(1.4 1.15)" fill="#181B1A">
+    <rect x="82" y="190" width="32" height="138"/>
+    <circle cx="98" cy="190" r="16"/><circle cx="98" cy="328" r="16"/>
+    <path d="M85 199 111 181 173 268 147 286Z"/>
+    <circle cx="160" cy="277" r="16"/>
+    <path d="M147 268 209 181 235 199 173 286Z"/>
+    <rect x="206" y="190" width="32" height="138"/>
+    <circle cx="222" cy="190" r="16"/><circle cx="222" cy="328" r="16"/>
+  </g>
+
+  <path d="M187 316 C182 317 177 314 177 309 C177 305 180 302 184 301 C231 287 287 282 331 290 C336 291 339 295 338 300 C337 305 333 308 328 307 C285 299 238 303 191 316 C190 316 188 316 187 316 Z" fill="#181B1A"/>
+
+  <g transform="translate(-50 179) scale(.9 .75)">
+    <g fill="#181B1A">
+      <circle cx="279" cy="286" r="39"/>
+      <rect x="308" y="247" width="21" height="79" rx="10.5"/>
+      <path d="M338 326V260C338 253 343 248 349 248C356 248 360 253 360 260V264C367 253 375 249 386 250V272C372 268 359 280 359 295V326Z"/>
+      <rect x="398" y="221" width="21" height="114" rx="10.5"/>
+      <rect x="382" y="262" width="51" height="21" rx="10.5"/>
+    </g>
+    <circle cx="279" cy="286" r="18" fill="#FFFFFF"/>
+  </g>
+</svg>

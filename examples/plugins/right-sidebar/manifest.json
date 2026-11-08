@@ -1,0 +1,11 @@
+{
+  "apiVersion": 2,
+  "id": "dev.markart.right-sidebar",
+  "name": "右侧栏测试",
+  "version": "0.1.0",
+  "description": "侧栏面板接口验证",
+  "permissions": {
+    "required": [],
+    "optional": []
+  }
+}
