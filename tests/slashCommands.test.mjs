@@ -1,8 +1,9 @@
+import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { build } from 'esbuild'
 
-const bundle = await build({ entryPoints: [new URL('../src/editor/slashCommands.ts', import.meta.url).pathname], bundle: true, platform: 'node', format: 'esm', write: false })
+const bundle = await build({ entryPoints: [fileURLToPath(new URL('../src/editor/slashCommands.ts', import.meta.url))], bundle: true, platform: 'node', format: 'esm', write: false })
 const { slashCommands, slashRange, slashCommandChange, matchingSlashCommands, slashKeywordMatches } = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`)
 
 test('slash before existing text opens commands and formats without removing text', () => {

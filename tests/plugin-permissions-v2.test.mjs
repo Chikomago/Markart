@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {build} from 'esbuild'
@@ -8,8 +9,8 @@ const dir=mkdtempSync(join(tmpdir(),'markart-grants-test-')),output=join(dir,'gr
 await build({entryPoints:['src/plugins/permissions/grants.ts'],bundle:true,platform:'node',format:'esm',outfile:output})
 const declarationOutput=join(dir,'declaration.mjs')
 await build({entryPoints:['src/plugins/permissions/declaration.ts'],bundle:true,platform:'node',format:'esm',outfile:declarationOutput})
-const {PluginGrants}=await import(output)
-const {addedPermissions}=await import(declarationOutput)
+const {PluginGrants}=await import(pathToFileURL(output).href)
+const {addedPermissions}=await import(pathToFileURL(declarationOutput).href)
 const declaration={required:['files.read','network'],optional:['files.write']}
 test('capability grants survive directory changes while optional permissions stay denied',()=>{
  const grants=new PluginGrants();grants.approve('demo',declaration);assert.doesNotThrow(()=>grants.require('demo','files.read'));assert.throws(()=>grants.require('demo','files.write'));assert.equal('roots' in grants.state.demo,false);grants.revoke('demo');assert.throws(()=>grants.require('demo','files.read'))

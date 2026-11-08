@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtempSync } from 'node:fs'
@@ -7,7 +8,7 @@ import { build } from 'esbuild'
 
 const dir = mkdtempSync(join(tmpdir(), 'markart-view-test-')), output = join(dir, 'panel.mjs')
 await build({ entryPoints: ['examples/plugins/shared/indexPanel.ts'], bundle: true, platform: 'node', format: 'esm', outfile: output })
-const { scopeFiles } = await import(output)
+const { scopeFiles } = await import(pathToFileURL(output).href)
 
 const files = [
   { id: '1', path: 'a/x.md', version: 1, size: 1, text: true },

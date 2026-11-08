@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {build} from 'esbuild'
@@ -6,7 +7,7 @@ import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 const dir=mkdtempSync(join(tmpdir(),'markart-index-plugins-'))
 const modules={}
-for(const name of ['graph','tags','backlinks']){const output=join(dir,name+'.mjs');await build({entryPoints:[`examples/plugins/${name}/main.ts`],outfile:output,bundle:true,platform:'node',format:'esm'});modules[name]=await import(output)}
+for(const name of ['graph','tags','backlinks']){const output=join(dir,name+'.mjs');await build({entryPoints:[`examples/plugins/${name}/main.ts`],outfile:output,bundle:true,platform:'node',format:'esm'});modules[name]=await import(pathToFileURL(output).href)}
 function flatten(tree){return [tree,...(tree.children||[]).flatMap(flatten)]}
 function fixture(){
  const files=[{id:'a',path:'a.md',version:1,text:true,size:20},{id:'b',path:'b.md',version:1,text:true,size:20}]

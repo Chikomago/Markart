@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {build} from 'esbuild'
@@ -6,7 +7,7 @@ import {tmpdir} from 'node:os'
 import {join} from 'node:path'
 const dir=mkdtempSync(join(tmpdir(),'markart-panel-test-')),output=join(dir,'layout.mjs')
 await build({entryPoints:['src/plugins/ui/sidebarLayout.ts'],bundle:true,platform:'node',format:'esm',outfile:output})
-const {SidebarLayout,filesView,outlineView}=await import(output)
+const {SidebarLayout,filesView,outlineView}=await import(pathToFileURL(output).href)
 function storage(){const values=new Map();return {getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)}}
 test('panel instances move across all groups without changing identity or state',()=>{
  const disk=storage(),layout=new SidebarLayout(disk),groups=layout.state.groups

@@ -1,3 +1,4 @@
+import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {build} from 'esbuild'
@@ -6,12 +7,12 @@ import {join} from 'node:path'
 import {tmpdir} from 'node:os'
 const dir=mkdtempSync(join(tmpdir(),'markart-plugin-source-')),output=join(dir,'community.mjs')
 await build({entryPoints:['src/plugins/community.ts'],bundle:true,platform:'node',format:'esm',outfile:output})
-const {pluginKey,parseCommunityDirectory}=await import(output)
+const {pluginKey,parseCommunityDirectory}=await import(pathToFileURL(output).href)
 const runtimeOutput=join(dir,'runtime.mjs')
 await build({entryPoints:['src/plugins/runtime.ts'],bundle:true,platform:'node',format:'esm',outfile:runtimeOutput})
 const stored=new Map()
 globalThis.localStorage={getItem:key=>stored.get(key)||null,setItem:(key,value)=>stored.set(key,value)}
-const {PluginRuntime,selectRestorablePlugins}=await import(runtimeOutput)
+const {PluginRuntime,selectRestorablePlugins}=await import(pathToFileURL(runtimeOutput).href)
 
 test('the same plugin id from two catalogs keeps two separate packages',()=>{
  const manifest={id:'example.notes'}
