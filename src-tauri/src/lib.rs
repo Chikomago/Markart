@@ -320,7 +320,7 @@ pub fn run() {
         .manage(lan_share::ShareState::default())
         .invoke_handler(tauri::generate_handler![
             windows::create_workspace_window,
-            quick_capture::open_quick_capture, quick_capture::open_saved_quick_capture, quick_capture::set_quick_capture, quick_capture::save_quick_capture, quick_capture::save_quick_capture_as, quick_capture::update_quick_capture, quick_capture::set_quick_capture_native_content, quick_capture::set_quick_capture_appearance, quick_capture::set_quick_capture_native_path, quick_capture::quick_capture_native_status,
+            quick_capture::open_quick_capture, quick_capture::open_saved_quick_capture, quick_capture::set_quick_capture, quick_capture::set_menu_bar_icon, quick_capture::save_quick_capture, quick_capture::save_quick_capture_as, quick_capture::update_quick_capture, quick_capture::set_quick_capture_native_content, quick_capture::set_quick_capture_appearance, quick_capture::set_quick_capture_native_path, quick_capture::quick_capture_native_status,
             native_alert::confirm_discard_changes,
             themes::list_installed_themes, themes::install_theme_folder, themes::remove_installed_theme,
             plugins::plugin_fetch_text, plugins::plugin_request_scoped, plugins::plugin_native, plugins::plugin_import_local,
@@ -415,7 +415,9 @@ pub fn run() {
         .expect("error while building tauri application")
         .run(|app, event| {
             if let tauri::RunEvent::ExitRequested { api, .. } = &event {
-                if app.state::<quick_capture::QuickCaptureState>().enabled.load(std::sync::atomic::Ordering::SeqCst) { api.prevent_exit(); }
+                let quick_capture = app.state::<quick_capture::QuickCaptureState>();
+                if quick_capture.enabled.load(std::sync::atomic::Ordering::SeqCst)
+                    || quick_capture.tray_visible.load(std::sync::atomic::Ordering::SeqCst) { api.prevent_exit(); }
             }
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Reopen { .. } = &event {

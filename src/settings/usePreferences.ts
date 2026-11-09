@@ -63,6 +63,7 @@ export function usePreferences(deps: {
     { tab: 'startup' as const, get label() { return t('启动时') }, keywords: '启动 上次目录 文件 空白窗口' },
     { tab: 'startup' as const, get label() { return t('默认编辑器') }, keywords: '默认应用 Markdown 文件关联 打开方式' },
     { tab: 'startup' as const, get label() { return t('自动检测更新') }, keywords: '系统 更新 检测 自动' },
+    { tab: 'startup' as const, get label() { return t('显示菜单栏图标') }, keywords: '菜单栏 托盘 图标' },
     { tab: 'about' as const, get label() { return t('关于 Markart') }, keywords: '项目地址 作者 协议 版本 GitHub GPL about license' },
     { tab: 'startup' as const, get label() { return t('恢复默认设置') }, keywords: '系统 全部 恢复 默认 重置' },
     { tab: 'storage' as const, get label() { return t('图片与附件存储') }, keywords: '图片附件目录 剪贴板图片目录 文件命名 变量' },
@@ -203,6 +204,7 @@ export function usePreferences(deps: {
     finally { defaultEditorBusy.value = false }
   }
   const quickCaptureEnabled = useSetting('quickCaptureEnabled')
+  const menuBarIconVisible = useSetting('menuBarIconVisible')
   const quickCaptureCorner = useSetting('quickCaptureCorner')
   const autoCheckUpdates = useSetting('autoCheckUpdates')
   const sidebarOpenInput = useLayoutInput('sidebarOpen')
@@ -214,7 +216,7 @@ export function usePreferences(deps: {
   const editorTop = useSetting('editorTop')
   const zoomOptions = Array.from({ length: 16 }, (_, index) => 75 + index * 5)
   return {
-    useSetting, quickCaptureEnabled, quickCaptureCorner, showSettings, showThemes, settingsSearchInput, settingTab, settingSearch,
+    useSetting, quickCaptureEnabled, quickCaptureCorner, menuBarIconVisible, showSettings, showThemes, settingsSearchInput, settingTab, settingSearch,
     settingCategoryNames, settingCategoryTitle, pluginSettingCategories, settingSearchResults, openSettingSearchResult, settingVisible,
     themeName, themeNameInput, customThemes, customThemesInput, allThemes, selectableThemes,
     restoreDefaultTheme, selectTheme, addTheme, removeTheme,

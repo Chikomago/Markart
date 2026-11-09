@@ -8,6 +8,7 @@ export const SETTINGS_VERSION = 5
 
 export const settingRegistry = {
   quickCaptureEnabled: { category: 'quickCapture', default: false as boolean, valid: isBoolean },
+  menuBarIconVisible: { category: 'startup', default: false as boolean, valid: isBoolean },
   quickCaptureCorner: { category: 'quickCapture', default: 'top-right' as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right', valid: (value: unknown) => ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(value as string) },
   fileActionsAlwaysVisible: { category: 'appearance', default: true as boolean, valid: isBoolean },
   language: { category: 'startup', default: 'system' as Language, valid: (value: unknown) => localeOptions.some(option => option.value === value) },

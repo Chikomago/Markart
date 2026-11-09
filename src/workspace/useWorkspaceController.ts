@@ -83,7 +83,7 @@ const recentFiles = ref<RecentFile[]>((Array.isArray(persistedRecentFiles) ? per
 const showRecentFiles = ref(false)
 const showSortMenu = ref(false)
 const {
-  useSetting, quickCaptureEnabled, quickCaptureCorner, showSettings, showThemes, settingsSearchInput, settingTab, settingSearch,
+  useSetting, quickCaptureEnabled, quickCaptureCorner, menuBarIconVisible, showSettings, showThemes, settingsSearchInput, settingTab, settingSearch,
   settingCategoryNames, settingCategoryTitle, pluginSettingCategories, settingSearchResults, openSettingSearchResult, settingVisible,
   themeName, themeNameInput, allThemes,
   restoreDefaultTheme, selectTheme, addTheme, removeTheme, resetAllSettings,
@@ -179,6 +179,11 @@ watch([quickCaptureEnabled, quickCaptureCorner, shortcutOverrides, recordingShor
   const shortcut = chord ? chord.split('+').map(part => part === 'Meta' ? 'CommandOrControl' : part === 'Control' ? 'Ctrl' : part.replace(/^Key/, '').replace(/^Digit/, '')).join('+') : ''
   try { await invoke('set_quick_capture', { enabled, corner, shortcut }) }
   catch (error) { notify(t('快速记录启用失败：{0}', { '0': String(error) })); if (enabled) quickCaptureEnabled.value = false }
+}, { immediate: true })
+watch(menuBarIconVisible, async visible => {
+  if (!isTauri) return
+  try { await invoke('set_menu_bar_icon', { visible }) }
+  catch (error) { notify(t('菜单栏图标设置失败：{0}', { '0': String(error) })); if (visible) menuBarIconVisible.value = false }
 }, { immediate: true })
 async function openQuickCapture() {
   if (!isTauri) { window.open('?quickCapture=1', '_blank'); return }
@@ -751,7 +756,7 @@ const preferencesContext = {
   addTheme,
   editorLayoutPreview, previewEditorLayout,
   uiFontFamily, uiFontPreview, editorFontPreview, fontsLoading,
-  defaultEditorBusy, setDefaultEditor, quickCaptureEnabled, quickCaptureCorner, openQuickCapture,
+  defaultEditorBusy, setDefaultEditor, quickCaptureEnabled, quickCaptureCorner, menuBarIconVisible, openQuickCapture,
   autoSyncEnabled, syncConflictPolicy,
   templateVariables, addPersonalItem, allThemes, assignedChord, attachmentDirectoryInput,
   language, localeOptions, attachmentNaming, autoCheckUpdates, cancelShortcutRecording, clearShortcut, clipboardDirectory,

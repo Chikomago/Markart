@@ -59,6 +59,7 @@ export default defineComponent({
             <div class="setting-row">{{ $t('启动时') }} <SettingSelect v-model="startupBehavior" :label="$t('启动时')" :options="[{ value: 'restore', label: $t('打开上次目录和文件') }, { value: 'blank', label: $t('新建未命名文件') }]"/></div>
             <div class="setting-row">{{ $t('默认编辑器') }}<button :disabled="defaultEditorBusy" @click="setDefaultEditor">{{ defaultEditorBusy ? $t('正在设置…') : $t('设为默认编辑器') }}</button></div>
             <div class="setting-row">{{ $t('自动检测更新') }} <input :aria-label="$t('自动检测更新')" v-model="autoCheckUpdates" type="checkbox"/></div>
+            <div class="setting-row">{{ $t('显示菜单栏图标') }} <input :aria-label="$t('显示菜单栏图标')" v-model="menuBarIconVisible" type="checkbox" :disabled="!isTauri"/></div>
             <div class="setting-row settings-reset-row">{{ $t('恢复默认设置') }}<button @click="resetAllSettings">{{ $t('全部恢复默认') }}</button></div>
           </template>
           <template v-else-if="settingTab === 'quickCapture'">

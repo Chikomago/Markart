@@ -11,6 +11,7 @@ const CAPTURE: &str = "quick-capture";
 pub struct QuickCaptureState {
     pub enabled: AtomicBool,
     tray: Mutex<Option<TrayIcon>>,
+    pub tray_visible: AtomicBool,
     shortcut: Mutex<Option<String>>,
     corner: Mutex<String>,
     corner_monitor_started: AtomicBool,
@@ -215,30 +216,37 @@ pub fn set_quick_capture(app: AppHandle, enabled: bool, corner: String, shortcut
             }).map_err(|error| format!("快捷键不可用：{error}"))?; *registered = Some(shortcut); }
         }
         drop(registered);
-        if state.tray.lock().map_err(|error| error.to_string())?.is_none() {
-            let quick = MenuItem::with_id(&app, "quick-open", "快速记录", true, None::<&str>).map_err(|error| error.to_string())?;
-            let main = MenuItem::with_id(&app, "quick-main", "打开 Markart", true, None::<&str>).map_err(|error| error.to_string())?;
-            let quit = MenuItem::with_id(&app, "quick-quit", "退出 Markart", true, None::<&str>).map_err(|error| error.to_string())?;
-            let menu = Menu::with_items(&app, &[&quick, &main, &quit]).map_err(|error| error.to_string())?;
-            let mut builder = TrayIconBuilder::new().menu(&menu).tooltip("Markart 快速记录").on_menu_event(|app, event| match event.id().as_ref() {
-                "quick-open" => { let _ = open(app); },
-                "quick-main" => open_main(app),
-                "quick-quit" => { app.state::<QuickCaptureState>().enabled.store(false, Ordering::SeqCst); app.exit(0); },
-                _ => {}
-            });
-            builder = builder.icon(tauri::include_image!("icons/tray-template.png"));
-            #[cfg(target_os = "macos")]
-            { builder = builder.icon_as_template(true); }
-            let tray = builder.build(&app).map_err(|error| error.to_string())?;
-            *state.tray.lock().map_err(|error| error.to_string())? = Some(tray);
-        }
         state.enabled.store(true, Ordering::SeqCst);
         start_corner_monitor(&app);
     } else {
         state.enabled.store(false, Ordering::SeqCst);
         if let Some(previous) = state.shortcut.lock().map_err(|error| error.to_string())?.take() { let _ = app.global_shortcut().unregister(previous.as_str()); }
-        state.tray.lock().map_err(|error| error.to_string())?.take();
     }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_menu_bar_icon(app: AppHandle, visible: bool) -> Result<(), String> {
+    let state = app.state::<QuickCaptureState>();
+    let mut tray = state.tray.lock().map_err(|error| error.to_string())?;
+    if let Some(icon) = tray.as_ref() {
+        icon.set_visible(visible).map_err(|error| error.to_string())?;
+    } else if visible {
+        let quick = MenuItem::with_id(&app, "quick-open", "快速记录", true, None::<&str>).map_err(|error| error.to_string())?;
+        let main = MenuItem::with_id(&app, "quick-main", "打开 Markart", true, None::<&str>).map_err(|error| error.to_string())?;
+        let quit = MenuItem::with_id(&app, "quick-quit", "退出 Markart", true, None::<&str>).map_err(|error| error.to_string())?;
+        let menu = Menu::with_items(&app, &[&quick, &main, &quit]).map_err(|error| error.to_string())?;
+        let mut builder = TrayIconBuilder::new().menu(&menu).tooltip("Markart").icon(tauri::include_image!("icons/tray-template.png")).on_menu_event(|app, event| match event.id().as_ref() {
+            "quick-open" => { let _ = open(app); },
+            "quick-main" => open_main(app),
+            "quick-quit" => { app.exit(0); },
+            _ => {}
+        });
+        #[cfg(target_os = "macos")]
+        { builder = builder.icon_as_template(true); }
+        *tray = Some(builder.build(&app).map_err(|error| error.to_string())?);
+    }
+    state.tray_visible.store(visible, Ordering::SeqCst);
     Ok(())
 }
 
