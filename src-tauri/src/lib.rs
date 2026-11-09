@@ -31,7 +31,7 @@ mod plugin_focus;
 mod navigation_policy;
 
 use tauri::{Emitter, Manager};
-#[cfg(not(target_os = "macos"))]
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
 use tauri::menu::AboutMetadata;
 use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
 
@@ -187,18 +187,21 @@ pub fn run() {
     }));
     builder
         .menu(|app| {
+            #[cfg(not(target_os = "windows"))]
             let sep1 = PredefinedMenuItem::separator(app)?;
+            #[cfg(not(target_os = "windows"))]
             let sep2 = PredefinedMenuItem::separator(app)?;
             let sep3 = PredefinedMenuItem::separator(app)?;
             #[cfg(target_os = "macos")]
             let about_item = MenuItem::with_id(app, "app-about", "关于", true, None::<&str>)?;
-            #[cfg(not(target_os = "macos"))]
+            #[cfg(not(any(target_os = "macos", target_os = "windows")))]
             let about_item = PredefinedMenuItem::about(app, Some("关于"), Some(AboutMetadata {
                 name: Some("Markart".into()), version: Some(app.package_info().version.to_string()),
                 icon: Some(tauri::include_image!("icons/128x128.png")),
                 authors: Some(vec![env!("CARGO_PKG_AUTHORS").into()]), license: Some(env!("CARGO_PKG_LICENSE").into()),
                 ..Default::default()
             }))?;
+            #[cfg(not(target_os = "windows"))]
             let app_menu = Submenu::with_items(app, "Markart", true, &[&about_item, &sep1, &PredefinedMenuItem::hide(app, Some("隐藏 Markart"))?, &PredefinedMenuItem::hide_others(app, Some("隐藏其他"))?, &PredefinedMenuItem::show_all(app, Some("全部显示"))?, &sep2, &PredefinedMenuItem::quit(app, Some("退出 Markart"))?])?;
             let file_items = [
                 MenuItem::with_id(app, "file-new", "新建文件", true, Some("CmdOrCtrl+N"))?,
@@ -283,7 +286,10 @@ pub fn run() {
             let toggle_focus = CheckMenuItem::with_id(app, "toggle-focus", "专注模式", true, false, None::<&str>)?;
             let view_menu = Submenu::with_items(app, "显示", true, &[&view_wysiwyg, &view_source, &view_split, &toggle_sidebar, &toggle_toolbar, &toggle_typewriter, &toggle_read_only, &toggle_focus, &reset_theme])?;
             let window_menu = Submenu::with_items(app, "窗口", true, &[&MenuItem::with_id(app, "window-new", "新建窗口", true, None::<&str>)?])?;
-            Menu::with_items(app, &[&app_menu, &file_menu, &edit_menu, &format_menu, &paragraph_menu, &view_menu, &window_menu])
+            #[cfg(target_os = "windows")]
+            { Menu::with_items(app, &[&file_menu, &edit_menu, &format_menu, &paragraph_menu, &view_menu, &window_menu]) }
+            #[cfg(not(target_os = "windows"))]
+            { Menu::with_items(app, &[&app_menu, &file_menu, &edit_menu, &format_menu, &paragraph_menu, &view_menu, &window_menu]) }
         })
         .on_window_event(|window, event| {
             if matches!(event, tauri::WindowEvent::Destroyed) {
