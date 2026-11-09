@@ -35,6 +35,20 @@ export function isEmptyFencedCode(block: MarkdownBlock): boolean {
   return !!opening && !!closing && opening[1][0] === closing[1][0]
     && closing[1].length >= opening[1].length && lines.slice(1, -1).every(line => !line.trim())
 }
+export function visibleCodePosition(state: EditorState, position: number, previous?: number): number {
+  const block = markdownBlocks(state.doc.toString()).find(item => item.type === 'code' && position >= item.from && position <= item.to)
+  if (!block || !/^\s*(`{3,}|~{3,})/.test(block.text)) return position
+  const start = state.doc.lineAt(block.from), end = state.doc.lineAt(block.to)
+  const line = state.doc.lineAt(position)
+  if (line.number !== start.number && line.number !== end.number) return position
+  if (end.number <= start.number + 1) return block.to < state.doc.length ? block.to + 1 : Math.max(0, block.from - 1)
+  if (line.number === start.number) {
+    if (previous !== undefined && previous > position && previous <= block.to && block.from > 0) return block.from - 1
+    return state.doc.line(start.number + 1).from
+  }
+  if (previous !== undefined && previous < position && previous >= block.from && block.to < state.doc.length) return block.to + 1
+  return state.doc.line(end.number - 1).to
+}
 export interface LiveOptions {
   editingSyntax?: () => { from: number; to: number } | undefined
   diagramEditing?: boolean
@@ -253,6 +267,12 @@ export function nativeSelection(state: EditorState) {
 }
 
 export function liveMarkdown(options: LiveOptions): Extension {
+  const visibleSelection = EditorState.transactionFilter.of(transaction => {
+    if (options.preview || transaction.docChanged || !transaction.selection || !transaction.newSelection.main.empty) return transaction
+    const position = transaction.newSelection.main.head
+    const visible = visibleCodePosition(transaction.startState, position, transaction.startState.selection.main.head)
+    return visible === position ? transaction : [transaction, { selection: { anchor: visible }, sequential: true }]
+  })
   const breaks = Prec.highest(keymap.of([
     { key: 'Backspace', run: deleteEmptyCodeBlock },
     { key: 'Delete', run: deleteEmptyCodeBlock },
@@ -429,15 +449,16 @@ export function liveMarkdown(options: LiveOptions): Extension {
     if (options.preview || start.button !== 0 || start.detail !== 1 || start.shiftKey || start.metaKey || start.ctrlKey || start.altKey) return null
     let anchor = view.posAtCoords({ x: start.clientX, y: start.clientY }, false)
     if (anchor == null) return null
+    anchor = visibleCodePosition(view.state, anchor)
     let dragging = false
     return {
       get(event) {
         if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) >= 4) dragging = true
-        const head = dragging ? view.posAtCoords({ x: event.clientX, y: event.clientY }, false) ?? anchor! : anchor!
+        const head = dragging ? visibleCodePosition(view.state, view.posAtCoords({ x: event.clientX, y: event.clientY }, false) ?? anchor!) : anchor!
         return EditorSelection.create([EditorSelection.range(anchor!, head)])
       },
       update(update) { if (update.docChanged) anchor = update.changes.mapPos(anchor!) }
     }
   })
-  return [presentation, mouse, breaks]
+  return [presentation, mouse, visibleSelection, breaks]
 }
