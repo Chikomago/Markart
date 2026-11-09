@@ -4,10 +4,12 @@
 
 基于 Tauri 2、Vue 3、CodeMirror 6 和 Rust 。
 
+本项目暂不提供插件及审核，可自行创建。
+
 <img width="1680" height="946" alt="image" src="https://github.com/user-attachments/assets/80b775dd-0076-4583-a9b2-218cb0444231" />
 
 
-本项目暂不提供插件及审核，可自行创建。
+
 
 ## 项目功能
 
