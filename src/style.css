@@ -537,6 +537,9 @@ html,body,#app{overscroll-behavior:none}
 .cm-native-code-tools{display:flex;justify-content:flex-end;align-items:center;gap:14px;background:var(--panel);padding:6px 12px 22px;border-radius:0 0 6px 6px}
 .cm-native-language{width:140px;max-width:50%;text-align:right;font:12px var(--code-font-family,monospace);color:var(--muted);border:0;background:transparent}
 .cm-native-language:focus{outline:1px solid var(--line-strong);border-radius:3px}
+.cm-native-code-delete{border:0;background:transparent;color:var(--muted);font:12px system-ui;cursor:pointer}
+.cm-native-code-delete:hover{color:var(--ink);text-decoration:underline}
+.cm-native-code-delete:disabled{opacity:.5;cursor:default;text-decoration:none}
 .cm-native-copy{border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--muted);font:11px system-ui;padding:2px 7px;cursor:pointer}
 .cm-rich-mode .cm-native-quote{background:var(--panel);border-left:3px solid var(--line-strong);padding-left:14px;text-indent:0}
 .cm-native-preview{margin:0;padding:0}.cm-native-preview table{max-width:100%}

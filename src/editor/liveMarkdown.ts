@@ -27,6 +27,14 @@ export function markdownBlocks(source: string): MarkdownBlock[] {
   }
   return result
 }
+export function isEmptyFencedCode(block: MarkdownBlock): boolean {
+  if (block.type !== 'code') return false
+  const lines = block.text.split('\n')
+  const opening = /^[ \t]*(`{3,}|~{3,})[^\n]*$/.exec(lines[0])
+  const closing = /^[ \t]*(`{3,}|~{3,})[ \t]*$/.exec(lines.at(-1) || '')
+  return !!opening && !!closing && opening[1][0] === closing[1][0]
+    && closing[1].length >= opening[1].length && lines.slice(1, -1).every(line => !line.trim())
+}
 export interface LiveOptions {
   editingSyntax?: () => { from: number; to: number } | undefined
   diagramEditing?: boolean
@@ -205,7 +213,14 @@ class CodeTools extends WidgetType {
     }
     language.addEventListener('blur', commit)
     language.addEventListener('keydown', event => { event.stopPropagation(); if (event.key === 'Enter') { event.preventDefault(); commit(); view.focus() } })
-    root.append(language, list); return root
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'cm-native-code-delete'; remove.textContent = t('删除'); remove.setAttribute('aria-label', t('删除代码块')); remove.disabled = this.options.readOnly
+    remove.addEventListener('mousedown', event => event.preventDefault())
+    remove.addEventListener('click', event => {
+      event.stopPropagation()
+      view.dispatch({ changes: { from: this.block.from, to: Math.min(this.block.to + 1, view.state.doc.length), insert: '' }, selection: { anchor: this.block.from }, userEvent: 'delete', scrollIntoView: true })
+      view.focus()
+    })
+    root.append(language, list, remove); return root
   }
   ignoreEvent() { return true }
 }
@@ -239,9 +254,19 @@ export function nativeSelection(state: EditorState) {
 
 export function liveMarkdown(options: LiveOptions): Extension {
   const breaks = Prec.highest(keymap.of([
+    { key: 'Backspace', run: deleteEmptyCodeBlock },
+    { key: 'Delete', run: deleteEmptyCodeBlock },
     { key: 'Enter', run: view => insertBreak(view, false) },
     { key: 'Shift-Enter', run: view => insertBreak(view, true) }
   ]))
+  function deleteEmptyCodeBlock(view: EditorView) {
+    if (options.preview || options.readOnly || view.composing) return false
+    const source = view.state.doc.toString(), selection = view.state.selection.main
+    const block = markdownBlocks(source).find(item => selection.from >= item.from && selection.to <= item.to && isEmptyFencedCode(item))
+    if (!block || source.slice(selection.from, selection.to).trim()) return false
+    view.dispatch({ changes: { from: block.from, to: Math.min(block.to + 1, source.length), insert: '' }, selection: { anchor: block.from }, userEvent: 'delete', scrollIntoView: true })
+    return true
+  }
   function insertBreak(view: EditorView, soft: boolean) {
     if (options.preview || options.readOnly || view.composing) return false
     const metadata = frontmatterSection(view.state.doc.toString())
