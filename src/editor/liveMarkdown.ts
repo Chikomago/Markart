@@ -35,6 +35,11 @@ export function isEmptyFencedCode(block: MarkdownBlock): boolean {
   return !!opening && !!closing && opening[1][0] === closing[1][0]
     && closing[1].length >= opening[1].length && lines.slice(1, -1).every(line => !line.trim())
 }
+export function insertedFencedCodeCaret(text: string): number | null {
+  const opening = /^[ \t]*(`{3,}|~{3,})[^\n]*\n/.exec(text)
+  const closing = /^[ \t]*(`{3,}|~{3,})[ \t]*$/.exec(text.replace(/\n+$/, '').split('\n').at(-1) || '')
+  return opening && closing && opening[1][0] === closing[1][0] && closing[1].length >= opening[1].length ? opening[0].length : null
+}
 export function visibleCodePosition(state: EditorState, position: number, previous?: number): number {
   const block = markdownBlocks(state.doc.toString()).find(item => item.type === 'code' && position >= item.from && position <= item.to)
   if (!block || !/^\s*(`{3,}|~{3,})/.test(block.text)) return position
@@ -214,6 +219,12 @@ class CodeTools extends WidgetType {
   eq(other: CodeTools) { if (this.locale !== other.locale) return false; return this.block.text === other.block.text && this.block.from === other.block.from && this.options === other.options }
   toDOM(view: EditorView) {
     const root = document.createElement('div'); root.className = 'cm-native-code-tools'; root.contentEditable = 'false'
+    root.addEventListener('mousedown', event => {
+      if (event.target !== root || this.options.readOnly) return
+      event.preventDefault(); event.stopPropagation()
+      view.dispatch({ selection: { anchor: visibleCodePosition(view.state, this.block.to) } })
+      view.focus()
+    })
     const match = /^([ \t]*)(`{3,}|~{3,})([^\n]*)/.exec(this.block.text)!
     const language = document.createElement('input'); language.className = 'cm-native-language'; language.value = match[3].trim(); language.placeholder = '代码语言'; language.setAttribute('aria-label', t('代码语言')); language.disabled = this.options.readOnly
     const list = document.createElement('datalist'); list.id = `markart-languages-${++diagramSequence}`

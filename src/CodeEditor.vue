@@ -27,7 +27,7 @@ import { invoke, isTauri } from '@tauri-apps/api/core'
 import { ChevronRight, ArrowUp, ArrowDown, RotateCcw, X } from 'lucide-vue-next'
 import FormatIcon from './editor/FormatIcon'
 import { markdownMarkers } from './editor/formatPresentation'
-import { liveMarkdown, markdownBlocks, nativeSelection } from './editor/liveMarkdown'
+import { liveMarkdown, markdownBlocks, nativeSelection, insertedFencedCodeCaret } from './editor/liveMarkdown'
 import { retainedDocument, retainDocument } from './editor/documentStates'
 import { headingsOf } from './editor/markdownCore'
 import { matchingSlashCommands as builtinSlashCommands, slashRange, slashCommandChange, slashKeywordMatches, type SlashCommand } from './editor/slashCommands'
@@ -143,7 +143,7 @@ function applyPluginEdits(documentId: string, expectedContent: string, edits: Pl
 
 function replaceRange(from: number, to: number, text: string) {
   if (!view || props.readOnly || props.previewOnly) return
-  view.dispatch({ userEvent: 'input', changes: { from, to, insert: text }, selection: { anchor: from + text.length }, scrollIntoView: true })
+  view.dispatch({ userEvent: 'input', changes: { from, to, insert: text }, selection: { anchor: from + (insertedFencedCodeCaret(text) ?? text.length) }, scrollIntoView: true })
 }
 function insertSnippet(text: string) {
   if (!view || props.readOnly || props.previewOnly) return
