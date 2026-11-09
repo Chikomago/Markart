@@ -89,7 +89,7 @@ const {
   restoreDefaultTheme, selectTheme, addTheme, removeTheme, resetAllSettings,
   templates, snippets, shortcutOverrides, spellcheckEnabled, fontSize, editorAlignment,
   lineHeight, paragraphSpacing, tableWidth, attachmentDirectory, gitEnabled, gitMaxVersions, gitRetentionDays,
-  zoom, focusMode, typewriter, wrapLines, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, exportFontFamily, exportPageSize,
+  zoom, focusMode, typewriter, wrapLines, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, foldContentWithOutline, exportFontFamily, exportPageSize,
   exportPageWidth, exportPageHeight, exportMarginPreset, exportMargin, systemFonts,
   loadSystemFonts, fontSizeInput, editorFontFamilyInput, lineHeightInput, indentInput,
   attachmentDirectoryInput, clipboardDirectory, attachmentNaming, startupBehavior,
@@ -325,7 +325,7 @@ const {
   draggedHeadingIndex, outlineDropTarget, startOutlineDrag, clickOutlineHeading,
 } = useDocumentTools({
   isTauri, currentWorkspaceRoot, docs, activeDoc, activeId, content, markdownActive,
-  selectedText, selectionOffset, editor, previewEditor,
+  selectedText, selectionOffset, editor, previewEditor, foldContentWithOutline,
   selectDoc: id => selectDoc(id), jumpHeading: index => jumpHeading(index), notify,
 })
 const { spellDictionaries, dictionaryFiles, dictionaryRawDic, dictionaryRawAff,
@@ -766,7 +766,7 @@ const preferencesContext = {
   exportPageSize, exportPageWidth, fontSizeInput, formatChord, gitAvailable,
   gitEnabled, gitMaxVersions, gitRetentionDays, gitStatus, githubBusy, githubEnabled,
   githubHasToken, githubRepoBusy, githubRetryOnFailure, githubSyncIntervalSeconds, githubTokenDraft, githubUsername,
-  importSpellDictionary, paragraphSpacing, tableWidth, indentInput, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, lastGitFailure, lineHeightInput, loadSystemFonts,
+  importSpellDictionary, paragraphSpacing, tableWidth, indentInput, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, foldContentWithOutline, lastGitFailure, lineHeightInput, loadSystemFonts,
   logoutGithub, logoutWebdav, openSettingSearchResult, openStorageDirectory, outlineOpenInput,
   personalContent, personalItems, personalRenameDraft, personalRenameInput, personalRenamingId,
   recordShortcut, recordingShortcutId, refreshSpellDictionaries, removePersonalItem, removeTheme, resetAllSettings,

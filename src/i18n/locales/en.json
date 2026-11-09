@@ -206,6 +206,7 @@
   "自动换行": "Wrap lines",
   "显示正文行号": "Show body line numbers",
   "代码、图表与公式行号": "Code, diagram and math line numbers",
+  "折叠大纲时折叠内容": "Fold content with outline",
   "图表可视化编辑": "Visual diagram editing",
   "外部文件修改": "External file changes",
   "自动加载": "Reload automatically",

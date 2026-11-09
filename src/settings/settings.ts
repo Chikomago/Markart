@@ -67,6 +67,7 @@ export const settingRegistry = {
   diagramVisualEditing: { category: 'editor', default: true as boolean, valid: isBoolean },
   bodyLineNumbers: { category: 'editor', default: false as boolean, valid: isBoolean },
   codeBlockLineNumbers: { category: 'editor', default: false as boolean, valid: isBoolean },
+  foldContentWithOutline: { category: 'editor', default: true as boolean, valid: isBoolean },
   sidebarTop: { category: 'topbar', default: ['sidebar', 'settings', 'files'] as string[], valid: isCommandList },
   editorTop: { category: 'topbar', default: ['mode', 'reference', 'commands', 'theme', 'export', 'focus'] as string[], valid: isCommandList }
 } as const

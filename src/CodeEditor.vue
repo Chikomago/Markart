@@ -296,12 +296,28 @@ function toggleHeadingFold(index: number) {
   if (!range) return
   let folded = false
   foldedRanges(view.state).between(range.from, range.from, (from, to) => { if (from === range.from && to === range.to) folded = true })
-  view.dispatch({ effects: (folded ? unfoldEffect : foldEffect).of(range) })
+  setHeadingFold(index, !folded)
+}
+function setHeadingFold(index: number, folded: boolean) {
+  if (!view) return
+  const range = headingFoldRanges()[index]
+  if (!range) return
+  let current = false
+  foldedRanges(view.state).between(range.from, range.from, (from, to) => { if (from === range.from && to === range.to) current = true })
+  if (current !== folded) view.dispatch({ effects: (folded ? foldEffect : unfoldEffect).of(range) })
+}
+function setHeadingFolds(indices: number[]) {
+  if (!view) return
+  const wanted = new Set(indices), current = new Map<number, number>()
+  foldedRanges(view.state).between(0, view.state.doc.length, (from, to) => { current.set(from, to) })
+  const effects = headingFoldRanges().flatMap((range, index) => {
+    if (!range || (current.get(range.from) === range.to) === wanted.has(index)) return []
+    return [(wanted.has(index) ? foldEffect : unfoldEffect).of(range)]
+  })
+  if (effects.length) view.dispatch({ effects })
 }
 function setAllHeadingsFolded(folded: boolean) {
-  if (!view) return
-  const effects = headingFoldRanges().flatMap(range => range ? [(folded ? foldEffect : unfoldEffect).of(range)] : [])
-  if (effects.length) view.dispatch({ effects })
+  setHeadingFolds(folded ? headingFoldRanges().map((_, index) => index) : [])
 }
 function jumpLine(line: number) { if (view) selectRange(view.state.doc.line(Math.max(1, Math.min(line, view.state.doc.lines))).from, 0) }
 function scrollTopForOffset(position: number) {
@@ -495,7 +511,7 @@ watch(() => [props.rich, props.diagramVisualEditing, props.previewOnly, props.re
 watch(slashOpen, () => { void nextTick(positionSlashMenu) })
 watch(() => props.layoutKey, () => view?.requestMeasure())
 function pluginSelection() { const selection = view?.state.selection.main; return selection && view ? { from: selection.from, to: selection.to, text: view.state.sliceDoc(selection.from, selection.to) } : { from: 0, to: 0, text: '' } }
-defineExpose({ applyPluginEdits, pluginSelection, focus, undo, redo, openFind, currentBlockText, insertParagraph, deleteCurrentBlock, deleteSelection, applyBlock, format, jumpHeading, toggleHeadingFold, setAllHeadingsFolded, jumpLine, selectRange, replaceRange, scrollTopForOffset, setScrollTop, insertSnippet })
+defineExpose({ applyPluginEdits, pluginSelection, focus, undo, redo, openFind, currentBlockText, insertParagraph, deleteCurrentBlock, deleteSelection, applyBlock, format, jumpHeading, toggleHeadingFold, setHeadingFold, setHeadingFolds, setAllHeadingsFolded, jumpLine, selectRange, replaceRange, scrollTopForOffset, setScrollTop, insertSnippet })
 </script>
 <template>
   <div class="code-editor-wrap cm-document-editor" :class="{ 'cm-rich-mode': rich, 'show-body-line-numbers': bodyLineNumbers, 'markart-focus-mode': focusMode, 'typewriter-mode': typewriter }">

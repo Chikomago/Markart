@@ -8,7 +8,7 @@ import type { Doc } from '../workspace/sample'
 import { headingsOf } from '../editor/markdownCore'
 
 export function useDocumentTools({ isTauri, currentWorkspaceRoot, activeDoc, activeId,
-  content, markdownActive, selectionOffset, editor, previewEditor,
+  content, markdownActive, selectionOffset, editor, previewEditor, foldContentWithOutline,
   jumpHeading, notify,
 }: {
   isTauri: boolean
@@ -22,6 +22,7 @@ export function useDocumentTools({ isTauri, currentWorkspaceRoot, activeDoc, act
   selectionOffset: Ref<number>
   editor: Ref<InstanceType<typeof CodeEditor> | null>
   previewEditor: Ref<InstanceType<typeof CodeEditor> | null>
+  foldContentWithOutline: Readonly<Ref<boolean>>
   selectDoc: (id: string) => Promise<unknown>
   jumpHeading: (index: number) => void
   notify: (message: string) => void
@@ -29,6 +30,7 @@ export function useDocumentTools({ isTauri, currentWorkspaceRoot, activeDoc, act
 const outlineAllCollapsed = ref(false)
 const collapsedOutlineHeadings = ref<number[]>([])
 function onHeadingFoldsChange(info: { collapsed: number[]; foldable: number[] }) {
+  if (!foldContentWithOutline.value) return
   collapsedOutlineHeadings.value = info.collapsed
   outlineAllCollapsed.value = info.foldable.length > 0 && info.foldable.every(index => info.collapsed.includes(index))
 }
@@ -36,17 +38,26 @@ function toggleAllOutlineSections() {
   const folded = !outlineAllCollapsed.value
   outlineAllCollapsed.value = folded
   collapsedOutlineHeadings.value = outlineAllCollapsed.value ? headingsOf(content.value).map((_, index) => index) : []
-  editor.value?.setAllHeadingsFolded(folded)
-  previewEditor.value?.setAllHeadingsFolded(folded)
+  if (foldContentWithOutline.value) {
+    editor.value?.setAllHeadingsFolded(folded)
+    previewEditor.value?.setAllHeadingsFolded(folded)
+  }
 }
 function toggleOutlineHeading(index: number) {
   const collapsed = new Set(collapsedOutlineHeadings.value.filter(item => item >= 0))
   if (collapsed.has(index)) collapsed.delete(index); else collapsed.add(index)
   collapsedOutlineHeadings.value = [...collapsed]
   outlineAllCollapsed.value = false
-  editor.value?.toggleHeadingFold(index)
-  previewEditor.value?.toggleHeadingFold(index)
+  if (foldContentWithOutline.value) {
+    editor.value?.setHeadingFold(index, collapsed.has(index))
+    previewEditor.value?.setHeadingFold(index, collapsed.has(index))
+  }
 }
+watch(foldContentWithOutline, enabled => {
+  const collapsed = enabled ? collapsedOutlineHeadings.value : []
+  editor.value?.setHeadingFolds(collapsed)
+  previewEditor.value?.setHeadingFolds(collapsed)
+})
 function documentPath(doc: Doc) { return isTauri && doc.relativePath ? `${currentWorkspaceRoot.value}/${doc.relativePath}` : doc.path }
 const imagePropertyDraft = ref<ImagePropertyDraft | null>(null)
 const imagePropertyDocId = ref('')

@@ -108,6 +108,7 @@ export default defineComponent({
             <div v-if="settingVisible('自动换行')" class="setting-row">{{ $t('自动换行') }} <input :aria-label="$t('自动换行')" v-model="wrapLinesInput" type="checkbox"/></div>
             <div v-if="settingVisible('显示正文行号')" class="setting-row">{{ $t('显示正文行号') }} <input :aria-label="$t('显示正文行号')" v-model="bodyLineNumbers" type="checkbox"/></div>
             <div v-if="settingVisible('代码、图表与公式行号')" class="setting-row">{{ $t('代码、图表与公式行号') }} <input :aria-label="$t('代码、图表与公式行号')" v-model="codeBlockLineNumbers" type="checkbox"/></div>
+            <div v-if="settingVisible('折叠大纲时折叠内容')" class="setting-row">{{ $t('折叠大纲时折叠内容') }} <input :aria-label="$t('折叠大纲时折叠内容')" v-model="foldContentWithOutline" type="checkbox"/></div>
             <div v-if="settingVisible('图表可视化编辑')" class="setting-row">{{ $t('图表可视化编辑') }} <input :aria-label="$t('图表可视化编辑')" v-model="diagramVisualEditing" type="checkbox"/></div>
             <div v-if="settingVisible('外部文件修改')" class="setting-row"><span class="setting-row-title">{{ $t('外部文件修改') }}</span><div class="setting-segmented" role="group" :aria-label="$t('外部文件修改')"><button type="button" :class="{ active: externalFileChanges === 'auto' }" :aria-pressed="externalFileChanges === 'auto'" @click="externalFileChanges = 'auto'">{{ $t('自动加载') }}</button><button type="button" :class="{ active: externalFileChanges === 'confirm' }" :aria-pressed="externalFileChanges === 'confirm'" @click="externalFileChanges = 'confirm'">{{ $t('弹窗确认') }}</button></div></div>
           </template>

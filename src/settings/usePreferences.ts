@@ -64,6 +64,7 @@ export function usePreferences(deps: {
     { tab: 'startup' as const, get label() { return t('默认编辑器') }, keywords: '默认应用 Markdown 文件关联 打开方式' },
     { tab: 'startup' as const, get label() { return t('自动检测更新') }, keywords: '系统 更新 检测 自动' },
     { tab: 'startup' as const, get label() { return t('显示菜单栏图标') }, keywords: '菜单栏 托盘 图标' },
+    { tab: 'editor' as const, get label() { return t('折叠大纲时折叠内容') }, keywords: '大纲 标题 折叠 正文 内容' },
     { tab: 'about' as const, get label() { return t('关于 Markart') }, keywords: '项目地址 作者 协议 版本 GitHub GPL about license' },
     { tab: 'startup' as const, get label() { return t('恢复默认设置') }, keywords: '系统 全部 恢复 默认 重置' },
     { tab: 'storage' as const, get label() { return t('图片与附件存储') }, keywords: '图片附件目录 剪贴板图片目录 文件命名 变量' },
@@ -158,6 +159,7 @@ export function usePreferences(deps: {
   const diagramVisualEditing = useSetting('diagramVisualEditing')
   const bodyLineNumbers = useSetting('bodyLineNumbers')
   const codeBlockLineNumbers = useSetting('codeBlockLineNumbers')
+  const foldContentWithOutline = useSetting('foldContentWithOutline')
   const exportFontFamily = useSetting('exportFontFamily')
   const exportPageSize = useSetting('exportPageSize')
   const exportPageWidth = useSetting('exportPageWidth')
@@ -225,7 +227,7 @@ export function usePreferences(deps: {
     resetAllSettings, loadSystemFonts, systemFonts, templates, snippets, shortcutOverrides,
     spellcheckEnabled, fontSize, editorFontFamily, editorAlignment, lineHeight, paragraphSpacing, tableWidth, indent, attachmentDirectory,
     gitEnabled, gitMaxVersions, gitRetentionDays, zoom, focusMode, typewriter,
-    wrapLines, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, exportFontFamily, exportPageSize, exportPageWidth, exportPageHeight, exportMarginPreset,
+    wrapLines, externalFileChanges, diagramVisualEditing, bodyLineNumbers, codeBlockLineNumbers, foldContentWithOutline, exportFontFamily, exportPageSize, exportPageWidth, exportPageHeight, exportMarginPreset,
     exportMargin, fontSizeInput: fontSize, editorFontFamilyInput: editorFontFamily,
     lineHeightInput: lineHeight, indentInput: indent, attachmentDirectoryInput: attachmentDirectory,
     language, localeOptions, clipboardDirectory, attachmentNaming, startupBehavior, autoCheckUpdates, zoomInput: zoom,
