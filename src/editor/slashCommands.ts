@@ -24,7 +24,7 @@ export const slashCommands = [
   { id: 'task', get label() { return t('任务列表') }, search: '待办 task checkbox', snippet: '- [ ] ' },
   { id: 'quote', get label() { return t('引用') }, search: '引用 quote', snippet: '> ' },
   { id: 'table', get label() { return t('表格') }, search: 'table', snippet: defaultTable },
-  { id: 'code', get label() { return t('代码块') }, search: 'code', snippet: '```\n代码\n```' },
+  { id: 'code', get label() { return t('代码块') }, search: 'code', snippet: '```\n\n```' },
   { id: 'mermaid', get label() { return t('流程图') }, search: '流程图 图表 diagram mermaid', snippet: '```mermaid\ngraph TD\n  A[开始] --> B[结束]\n```' },
   { id: 'mindmap', get label() { return t('脑图') }, search: '思维导图 mindmap 脑图', snippet: '```mindmap\n  root((主题))\n    分支一\n    分支二\n```' },
   { id: 'formula', get label() { return t('公式块') }, search: 'math formula', snippet: '$$\n公式\n$$' },

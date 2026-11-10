@@ -27,18 +27,16 @@ export function markdownBlocks(source: string): MarkdownBlock[] {
   }
   return result
 }
-export function isEmptyFencedCode(block: MarkdownBlock): boolean {
-  if (block.type !== 'code') return false
-  const lines = block.text.split('\n')
-  const opening = /^[ \t]*(`{3,}|~{3,})[^\n]*$/.exec(lines[0])
-  const closing = /^[ \t]*(`{3,}|~{3,})[ \t]*$/.exec(lines.at(-1) || '')
-  return !!opening && !!closing && opening[1][0] === closing[1][0]
-    && closing[1].length >= opening[1].length && lines.slice(1, -1).every(line => !line.trim())
-}
 export function insertedFencedCodeCaret(text: string): number | null {
   const opening = /^[ \t]*(`{3,}|~{3,})[^\n]*\n/.exec(text)
   const closing = /^[ \t]*(`{3,}|~{3,})[ \t]*$/.exec(text.replace(/\n+$/, '').split('\n').at(-1) || '')
   return opening && closing && opening[1][0] === closing[1][0] && closing[1].length >= opening[1].length ? opening[0].length : null
+}
+function fencedCodeHasContent(block: MarkdownBlock): boolean {
+  if (block.type !== 'code') return false
+  const lines = block.text.split('\n')
+  if (!/^[ \t]*(`{3,}|~{3,})[^\n]*$/.test(lines[0]) || !/^[ \t]*(`{3,}|~{3,})[ \t]*$/.test(lines.at(-1) || '')) return false
+  return lines.slice(1, -1).some(line => !!line.trim())
 }
 export function visibleCodePosition(state: EditorState, position: number, previous?: number): number {
   const block = markdownBlocks(state.doc.toString()).find(item => item.type === 'code' && position >= item.from && position <= item.to)
@@ -227,25 +225,44 @@ class CodeTools extends WidgetType {
     })
     const match = /^([ \t]*)(`{3,}|~{3,})([^\n]*)/.exec(this.block.text)!
     const language = document.createElement('input'); language.className = 'cm-native-language'; language.value = match[3].trim(); language.placeholder = '代码语言'; language.setAttribute('aria-label', t('代码语言')); language.disabled = this.options.readOnly
-    const list = document.createElement('datalist'); list.id = `markart-languages-${++diagramSequence}`
-    for (const name of [...new Set(['mermaid', 'mindmap', ...languages.flatMap(item => [item.name.toLowerCase(), ...item.alias])])].sort()) { const option = document.createElement('option'); option.value = name; list.append(option) }
-    language.setAttribute('list', list.id)
+    const picker = document.createElement('div'); picker.className = 'cm-native-language-picker'
+    const list = document.createElement('div'); list.className = 'cm-native-language-list'; list.id = `markart-languages-${++diagramSequence}`; list.setAttribute('role', 'listbox'); list.hidden = true
+    const names = [...new Set(['mermaid', 'mindmap', ...languages.flatMap(item => [item.name.toLowerCase(), ...item.alias])])].sort()
+    let highlighted = 0
+    const renderList = () => {
+      const query = language.value.trim().toLowerCase()
+      const matches = names.filter(name => name.includes(query))
+      list.replaceChildren()
+      highlighted = Math.min(highlighted, Math.max(0, matches.length - 1))
+      for (const [index, name] of matches.entries()) {
+        const option = document.createElement('button'); option.type = 'button'; option.className = 'cm-native-language-option'; option.textContent = name; option.setAttribute('role', 'option'); option.setAttribute('aria-selected', String(index === highlighted))
+        option.addEventListener('mousedown', event => event.preventDefault())
+        option.addEventListener('click', () => { language.value = name; list.hidden = true; language.setAttribute('aria-expanded', 'false'); commit(); view.focus() })
+        list.append(option)
+      }
+      list.hidden = !matches.length; language.setAttribute('aria-expanded', String(!!matches.length))
+    }
+    language.setAttribute('role', 'combobox'); language.setAttribute('aria-autocomplete', 'list'); language.setAttribute('aria-controls', list.id); language.setAttribute('aria-expanded', 'false')
     // Commit once on blur/Enter so typing a language never destroys the focused input.
     const commit = () => {
       const from = this.block.from + match[1].length + match[2].length
       const value = language.value.trim().replace(/[\r\n]/g, '')
       if (value !== match[3]) view.dispatch({ changes: { from, to: from + match[3].length, insert: value }, userEvent: 'input' })
     }
-    language.addEventListener('blur', commit)
-    language.addEventListener('keydown', event => { event.stopPropagation(); if (event.key === 'Enter') { event.preventDefault(); commit(); view.focus() } })
-    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'cm-native-code-delete'; remove.textContent = t('删除'); remove.setAttribute('aria-label', t('删除代码块')); remove.disabled = this.options.readOnly
-    remove.addEventListener('mousedown', event => event.preventDefault())
-    remove.addEventListener('click', event => {
+    language.addEventListener('focus', renderList)
+    language.addEventListener('input', () => { highlighted = 0; renderList() })
+    language.addEventListener('blur', () => { list.hidden = true; language.setAttribute('aria-expanded', 'false'); commit() })
+    language.addEventListener('keydown', event => {
       event.stopPropagation()
-      view.dispatch({ changes: { from: this.block.from, to: Math.min(this.block.to + 1, view.state.doc.length), insert: '' }, selection: { anchor: this.block.from }, userEvent: 'delete', scrollIntoView: true })
-      view.focus()
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault(); const count = list.childElementCount
+        if (count) { highlighted = (highlighted + (event.key === 'ArrowDown' ? 1 : -1) + count) % count; for (const [index, option] of Array.from(list.children).entries()) option.setAttribute('aria-selected', String(index === highlighted)); list.children[highlighted].scrollIntoView({ block: 'nearest' }) }
+      } else if (event.key === 'Enter') {
+        event.preventDefault(); if (!list.hidden && list.children[highlighted]) language.value = list.children[highlighted].textContent || language.value
+        list.hidden = true; commit(); view.focus()
+      } else if (event.key === 'Escape') { event.preventDefault(); list.hidden = true; language.setAttribute('aria-expanded', 'false'); view.focus() }
     })
-    root.append(language, list, remove); return root
+    picker.append(language, list); root.append(picker); return root
   }
   ignoreEvent() { return true }
 }
@@ -291,11 +308,14 @@ export function liveMarkdown(options: LiveOptions): Extension {
     { key: 'Shift-Enter', run: view => insertBreak(view, true) }
   ]))
   function deleteEmptyCodeBlock(view: EditorView) {
-    if (options.preview || options.readOnly || view.composing) return false
-    const source = view.state.doc.toString(), selection = view.state.selection.main
-    const block = markdownBlocks(source).find(item => selection.from >= item.from && selection.to <= item.to && isEmptyFencedCode(item))
-    if (!block || source.slice(selection.from, selection.to).trim()) return false
-    view.dispatch({ changes: { from: block.from, to: Math.min(block.to + 1, source.length), insert: '' }, selection: { anchor: block.from }, userEvent: 'delete', scrollIntoView: true })
+    if (options.preview || options.readOnly || view.composing || !view.state.selection.main.empty) return false
+    const { head } = view.state.selection.main
+    const block = markdownBlocks(view.state.doc.toString()).find(item => item.type === 'code' && head > item.from && head < item.to && !fencedCodeHasContent(item))
+    if (!block) return false
+    const line = view.state.doc.lineAt(head)
+    const first = view.state.doc.lineAt(block.from), last = view.state.doc.lineAt(block.to)
+    if (last.number !== first.number + 2 || line.number !== first.number + 1 || line.text.trim()) return false
+    view.dispatch({ changes: { from: block.from, to: Math.min(block.to + 1, view.state.doc.length) }, selection: { anchor: block.from }, userEvent: 'delete', scrollIntoView: true })
     return true
   }
   function insertBreak(view: EditorView, soft: boolean) {
@@ -384,7 +404,7 @@ export function liveMarkdown(options: LiveOptions): Extension {
           decorations.push(Decoration.line({ class: (fence ? 'cm-native-fence' : 'cm-native-code-line') + (active ? ' cm-native-focused-code' : '') + (number === start.number + 1 ? ' cm-native-code-first' : ''), attributes: !fence && options.numbered ? { 'data-code-line': String(number - start.number) } : {} }).range(line.from))
           if (fence) hide(line.from, line.to)
         }
-        decorations.push(Decoration.widget({ widget: new CodeTools(block, options), block: true, side: 1 }).range(block.to))
+        if (active && !options.readOnly) decorations.push(Decoration.widget({ widget: new CodeTools(block, options), block: true, side: 1 }).range(block.to))
       }
     }
     const blocked = (from: number, to: number) => replaced.some(range => from >= range.from && to <= range.to)

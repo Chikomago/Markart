@@ -56,7 +56,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: Markart ${{ github.ref_name }}
-          releaseBody: '安装包与更新文件见下方附件。'
+          releaseBody: '修复空代码块反引号异常。安装包与更新文件见下方附件。'
           releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true

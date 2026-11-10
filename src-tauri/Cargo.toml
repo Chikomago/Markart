@@ -1,6 +1,6 @@
 [package]
 name = "markart"
-version = "0.1.2"
+version = "0.1.3"
 description = "A calm Markdown writing workspace"
 authors = ["chikomago"]
 license = "GPL-3.0-only"
